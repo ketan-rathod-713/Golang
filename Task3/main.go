@@ -5,7 +5,7 @@ import (
 )
 
 var SudokuData [][][]int = [][][]int{
-	// Empty Sudoku
+	// Empty Sudoku // Solvable and valid sudoku
 	{
 		{0, 0, 0, 0, 0, 0, 0, 0, 0},
 		{0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -52,6 +52,7 @@ var SudokuData [][][]int = [][][]int{
 		{2, 0, 7, 4, 1, 9, 6, 3, 5},
 		{3, 4, 5, 2, 8, 6, 1, 7, 9},
 	},
+	// unsolvable sudoku
 	{
 		{5, 3, 4, 6, 7, 8, 0, 1, 2},
 		{6, 7, 2, 1, 0, 5, 9, 4, 8},
@@ -63,6 +64,19 @@ var SudokuData [][][]int = [][][]int{
 		{2, 8, 7, 4, 1, 9, 6, 3, 5},
 		{3, 4, 5, 2, 8, 6, 1, 7, 9},
 	},
+	// Not solvable
+	{
+		{5, 3, 4, 6, 7, 8, 9, 1, 2},
+		{6, 7, 2, 1, 9, 5, 3, 4, 8},
+		{1, 9, 8, 3, 4, 2, 5, 6, 7},
+		{8, 5, 9, 7, 6, 1, 4, 2, 3},
+		{4, 2, 6, 8, 5, 3, 7, 9, 1},
+		{7, 1, 3, 9, 2, 4, 8, 5, 6},
+		{9, 6, 1, 5, 3, 7, 2, 8, 4},
+		{2, 8, 0, 4, 1, 9, 6, 7, 5},
+		{3, 4, 5, 2, 8, 6, 1, 0, 9},
+	},
+	// solvable
 	{
 		{5, 3, 4, 6, 7, 8, 0, 1, 2},
 		{6, 7, 2, 1, 0, 5, 0, 4, 8},
@@ -74,6 +88,7 @@ var SudokuData [][][]int = [][][]int{
 		{2, 8, 7, 4, 1, 9, 6, 3, 5},
 		{3, 4, 5, 2, 8, 6, 1, 7, 9},
 	},
+	// invalid sudoku
 	{
 		{5, 3, 4, 6, 7, 8, 2, 1, 2},
 		{6, 7, 2, 1, 0, 5, 0, 4, 8},
@@ -92,7 +107,8 @@ func main() {
 
 	/* Test All Sudoku */
 	for _, sudoku := range SudokuData {
-		if CheckValidSudoku(sudoku) {
+		validityOfSudoku, row, col := CheckValidSudoku(sudoku)
+		if validityOfSudoku {
 			ans := CheckSudokuSolvable(&sudoku, 0, 0)
 			if ans {
 				fmt.Println("Below Sudoku is Solvable")
@@ -101,7 +117,9 @@ func main() {
 			}
 			printSudoku(sudoku)
 		} else {
-			fmt.Println("Invalid Sudoku Provided")
+			fmt.Println("Invalid Sudoku Provided, See Below")
+			fmt.Printf("It Produces Error On Row %v and Column %v \n", row, col)
+			printSudoku(sudoku)
 		}
 	}
 }
@@ -109,8 +127,11 @@ func main() {
 /*
 	Checks if sudoku is valid or not
 	Using Set
+	Returns (isValid, Row, Column)
+	Row == -1 and Column == -1 if valid sudoku
+	else it will point to the cell which producing error
 */
-func CheckValidSudoku(sudoku [][]int) bool {
+func CheckValidSudoku(sudoku [][]int) (bool, int, int) {
 	// check all 3 condtions
 	mp := make(map[int]bool)
 
@@ -119,7 +140,7 @@ func CheckValidSudoku(sudoku [][]int) bool {
 		for j := 0; j < 9; j++ {
 			_, exist := mp[sudoku[i][j]]
 			if exist { // if already exist then return false as we want set here
-				return false
+				return false, i, j
 			} else {
 				if sudoku[i][j] != 0 {
 					mp[sudoku[i][j]] = true
@@ -137,7 +158,7 @@ func CheckValidSudoku(sudoku [][]int) bool {
 		for j := 0; j < 9; j++ {
 			_, exist := mp[sudoku[j][i]]
 			if exist { // if already exist then return false as we want set here
-				return false
+				return false, j, i
 			} else {
 				if sudoku[j][i] != 0 {
 					mp[sudoku[j][i]] = true
@@ -159,7 +180,7 @@ func CheckValidSudoku(sudoku [][]int) bool {
 				for n := j * 3; n < j*3+3; n++ {
 					_, exist := mp[sudoku[m][n]]
 					if exist { // if already exist then return false as we want set here
-						return false
+						return false, m, n
 					} else {
 						if sudoku[m][n] != 0 {
 							mp[sudoku[m][n]] = true
@@ -176,7 +197,7 @@ func CheckValidSudoku(sudoku [][]int) bool {
 		}
 	}
 
-	return true
+	return true, -1, -1 // no error
 }
 
 /*
