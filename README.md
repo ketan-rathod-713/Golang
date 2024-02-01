@@ -22,3 +22,9 @@ This Problem can be solved using recursion and backtracking. Below are the steps
 > 4. If Given Cell is not Empty ( Value is already been provided by puzzle maker ) THEN go on to check next cells without doing anything. Also if given cell is last then we got answer and hence return true.
 > 5. If Given Cell is Empty THEN try all possible values from 1 to 9 inclusive. For Any Given Value, Check If we can insert it to sudoku -> If Yes then insert it and check if it produces a valid sudoku or not. -> If it produces valid sudoku then immediatly return true as we got our answer. ( we only want single solution ha ha). If it doesn't produces valid sudoku then backtrack from this value and try next value till 9 and if nothing works then return false.
 > 6. Hence In this way we can check if given sudoku is solvable or not.
+
+### Running Code
+1. Clone this repo
+2. Go to task3SudokuSolver Branch
+3. cd Task3
+4. go run main.go
