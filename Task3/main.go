@@ -4,34 +4,22 @@ import (
 	"fmt"
 )
 
-func main() {
-	fmt.Println("Welcome To Sudoku Solver \n")
+var SudokuData [][][]int = [][][]int{
+	// Empty Sudoku
+	{
+		{0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0},
+	},
 
-	// input := [][]int{
-	// 	{5, 3, 0, 0, 7, 0, 0, 0, 0},
-	// 	{6, 0, 0, 1, 9, 5, 0, 0, 0},
-	// 	{0, 9, 8, 0, 0, 0, 0, 6, 0},
-	// 	{8, 0, 0, 0, 6, 0, 0, 0, 3},
-	// 	{4, 0, 0, 8, 0, 3, 0, 0, 1},
-	// 	{7, 0, 0, 0, 2, 0, 0, 0, 6},
-	// 	{0, 6, 0, 0, 0, 0, 2, 8, 0},
-	// 	{0, 0, 0, 4, 1, 9, 0, 0, 5},
-	// 	{0, 0, 0, 0, 8, 0, 0, 7, 9},
-	// }
-
-	// unsolvable_sudoku := [][]int{
-	// 	{5, 3, 0, 0, 7, 0, 0, 0, 0},
-	// 	{6, 0, 0, 1, 9, 5, 0, 0, 0},
-	// 	{0, 9, 8, 0, 0, 0, 0, 6, 0},
-	// 	{8, 0, 0, 0, 6, 0, 0, 0, 3},
-	// 	{4, 0, 0, 8, 0, 3, 0, 0, 1},
-	// 	{7, 0, 0, 0, 2, 0, 0, 0, 6},
-	// 	{0, 6, 0, 0, 0, 0, 2, 8, 0},
-	// 	{0, 0, 0, 4, 1, 9, 0, 0, 5},
-	// 	{0, 0, 0, 0, 8, 0, 0, 7, 9},
-	// }
-
-	exampleInput := [][]int{
+	// Example Input
+	{
 		{5, 3, 4, 6, 7, 8, 9, 1, 2},
 		{6, 7, 2, 1, 9, 5, 3, 4, 8},
 		{1, 9, 8, 3, 4, 2, 5, 6, 7},
@@ -41,41 +29,88 @@ func main() {
 		{9, 6, 1, 5, 3, 7, 2, 8, 4},
 		{2, 8, 7, 4, 1, 9, 6, 3, 5},
 		{3, 4, 5, 2, 8, 6, 1, 7, 9},
+	},
+	{
+		{5, 3, 0, 0, 7, 0, 0, 0, 0},
+		{6, 0, 0, 1, 9, 5, 0, 0, 0},
+		{0, 9, 8, 0, 0, 0, 0, 6, 0},
+		{8, 0, 0, 0, 6, 0, 0, 0, 3},
+		{4, 0, 0, 8, 0, 3, 0, 0, 1},
+		{7, 0, 0, 0, 2, 0, 0, 0, 6},
+		{0, 6, 0, 0, 0, 0, 2, 8, 0},
+		{0, 0, 0, 4, 1, 9, 0, 0, 5},
+		{0, 0, 0, 0, 8, 0, 0, 7, 9},
+	},
+	{
+		{0, 3, 4, 6, 7, 8, 9, 1, 2},
+		{6, 0, 2, 1, 9, 5, 3, 4, 8},
+		{1, 9, 0, 3, 4, 2, 5, 6, 7},
+		{8, 5, 9, 7, 6, 1, 4, 2, 3},
+		{4, 2, 6, 8, 5, 3, 7, 9, 1},
+		{7, 1, 3, 9, 2, 4, 8, 5, 6},
+		{9, 0, 1, 5, 3, 7, 2, 8, 4},
+		{2, 0, 7, 4, 1, 9, 6, 3, 5},
+		{3, 4, 5, 2, 8, 6, 1, 7, 9},
+	},
+	{
+		{5, 3, 4, 6, 7, 8, 0, 1, 2},
+		{6, 7, 2, 1, 0, 5, 9, 4, 8},
+		{1, 9, 8, 3, 4, 2, 5, 6, 7},
+		{8, 5, 9, 7, 6, 1, 4, 2, 3},
+		{4, 2, 6, 8, 5, 3, 7, 9, 1},
+		{7, 1, 3, 9, 2, 4, 8, 5, 6},
+		{9, 6, 1, 5, 3, 7, 2, 8, 4},
+		{2, 8, 7, 4, 1, 9, 6, 3, 5},
+		{3, 4, 5, 2, 8, 6, 1, 7, 9},
+	},
+	{
+		{5, 3, 4, 6, 7, 8, 0, 1, 2},
+		{6, 7, 2, 1, 0, 5, 0, 4, 8},
+		{1, 9, 8, 3, 4, 2, 5, 6, 7},
+		{8, 5, 9, 7, 6, 1, 4, 2, 3},
+		{4, 2, 6, 8, 5, 3, 7, 9, 1},
+		{7, 1, 3, 9, 2, 4, 8, 5, 6},
+		{9, 6, 1, 5, 3, 7, 2, 8, 4},
+		{2, 8, 7, 4, 1, 9, 6, 3, 5},
+		{3, 4, 5, 2, 8, 6, 1, 7, 9},
+	},
+	{
+		{5, 3, 4, 6, 7, 8, 2, 1, 2},
+		{6, 7, 2, 1, 0, 5, 0, 4, 8},
+		{1, 9, 8, 3, 4, 2, 5, 6, 7},
+		{8, 5, 9, 7, 6, 1, 4, 2, 3},
+		{4, 2, 6, 8, 5, 3, 7, 9, 1},
+		{7, 1, 3, 9, 2, 4, 8, 5, 6},
+		{9, 6, 1, 5, 3, 7, 2, 8, 4},
+		{2, 8, 7, 4, 1, 9, 6, 3, 5},
+		{3, 4, 5, 2, 8, 6, 1, 7, 9},
+	},
+}
+
+func main() {
+	fmt.Println("Welcome To Sudoku Solver \n")
+
+	/* Test All Sudoku */
+	for _, sudoku := range SudokuData {
+		if CheckValidSudoku(sudoku) {
+			ans := CheckSudokuSolvable(&sudoku, 0, 0)
+			if ans {
+				fmt.Println("Below Sudoku is Solvable")
+			} else {
+				fmt.Println("Below Sudoku is Not Solvable")
+			}
+			printSudoku(sudoku)
+		} else {
+			fmt.Println("Invalid Sudoku Provided")
+		}
 	}
-
-	unsolvable_sudoku := exampleInput
-	// emptySudoku := [][]int{
-	// 	{0, 0, 0, 0, 0, 0, 0, 0, 0},
-	// 	{0, 0, 0, 0, 0, 0, 0, 0, 0},
-	// 	{0, 0, 0, 0, 0, 0, 0, 0, 0},
-	// 	{0, 0, 0, 0, 0, 0, 0, 0, 0},
-	// 	{0, 0, 0, 0, 0, 0, 0, 0, 0},
-	// 	{0, 0, 0, 0, 0, 0, 0, 0, 0},
-	// 	{0, 0, 0, 0, 0, 0, 0, 0, 0},
-	// 	{0, 0, 0, 0, 0, 0, 0, 0, 0},
-	// 	{0, 0, 0, 0, 0, 0, 0, 0, 0},
-	// }
-
-	// printSudoku(emptySudoku)
-
-	ans := checkSudokuSolvable(&unsolvable_sudoku, 0, 0)
-
-	if ans {
-		fmt.Println("Sudoku is solvable")
-		printSudoku(unsolvable_sudoku)
-	} else {
-		fmt.Println("Sudoku is not solvable")
-		printSudoku(unsolvable_sudoku)
-	}
-
-	ans2 := checkValidSudoku(unsolvable_sudoku)
-	fmt.Println(ans2)
 }
 
 /*
 	Checks if sudoku is valid or not
+	Using Set
 */
-func checkValidSudoku(sudoku [][]int) bool {
+func CheckValidSudoku(sudoku [][]int) bool {
 	// check all 3 condtions
 	mp := make(map[int]bool)
 
@@ -86,7 +121,10 @@ func checkValidSudoku(sudoku [][]int) bool {
 			if exist { // if already exist then return false as we want set here
 				return false
 			} else {
-				mp[sudoku[i][j]] = true
+				if sudoku[i][j] != 0 {
+					mp[sudoku[i][j]] = true
+
+				}
 			}
 		}
 		for k := range mp {
@@ -101,7 +139,9 @@ func checkValidSudoku(sudoku [][]int) bool {
 			if exist { // if already exist then return false as we want set here
 				return false
 			} else {
-				mp[sudoku[j][i]] = true
+				if sudoku[j][i] != 0 {
+					mp[sudoku[j][i]] = true
+				}
 			}
 		}
 		for k := range mp {
@@ -121,7 +161,9 @@ func checkValidSudoku(sudoku [][]int) bool {
 					if exist { // if already exist then return false as we want set here
 						return false
 					} else {
-						mp[sudoku[m][n]] = true
+						if sudoku[m][n] != 0 {
+							mp[sudoku[m][n]] = true
+						}
 					}
 				}
 			}
@@ -139,75 +181,83 @@ func checkValidSudoku(sudoku [][]int) bool {
 
 /*
 	Checks if valid sudoku is solvable or not
-	- Using backtracking
+	Using backtracking
 */
-func checkSudokuSolvable(sudoku *[][]int, i int, j int) bool {
-	// fmt.Println("Check Sudoku For ", i, j)
+func CheckSudokuSolvable(sudoku *[][]int, i int, j int) bool {
+
+	// Get Next Sudoku Cell
 	nextCellI, nextCellJ := nextCell(i, j)
 
 	var ans bool = false
+
+	/*	If Empty Cell
+		Then : Try Values From 1 to 9 inclusive AND Check If Valid Sudoku can be Produced From it or not
+		Else : Already Placed Value -> Ignore it and move on to check next cell
+
+		If Any Try Value Results in valid sudoku then immediatly return true ( as we want only one possible solution )
+	*/
 	if (*sudoku)[i][j] == 0 { // given sudoku cell has empty value, i can try inserting 1 to 9 // let's see which works
 		// Check If I can insert value from 1 to 9
 
 		for val := 1; val <= 9; val++ {
-			// check if valid to insert for given sudoku
-
+			// Check if Value Can be inserted in cell or not // If Yes then insert value
 			if checkIsValidToInsertCellValue(*sudoku, i, j, val) {
 				(*sudoku)[i][j] = val
 
+				// If last cell THEN sudoku is solved // return true
 				if isLastCell(i, j) {
-					printSudoku(*sudoku)
 					return true
 				}
 
-				ans = checkSudokuSolvable(sudoku, nextCellI, nextCellJ)
+				// If not last cell THEN check for next remaining cells
+				ans = CheckSudokuSolvable(sudoku, nextCellI, nextCellJ)
 				if ans == true { // Return Here Only As Now We don't want to try other combinations
 					return true
 				} else {
-					// if ans is not true then mark given location with 0
+					// backtrack if this trial value found producing unsolvable sudoku (eg. we got false value )
 					(*sudoku)[i][j] = 0
 				}
-
 			} else {
 				continue
 			}
 		}
-	} else { // for Already Placed Values
-		// If last cell then no need to do anything just return true
+	} else {
+
+		// For Already Placed Values
 		if isLastCell(i, j) {
 			return true
 		}
 
-		// what if Here I check for one condtion that is if valid sudoku or not
-		// if here it is not valid then previous arrangements will be false hence
-		// TODO
-
-		//if not last cell then call CSS for next cell
-		ans = checkSudokuSolvable(sudoku, nextCellI, nextCellJ)
+		// If not last cell THEN check for next remaining cells
+		ans = CheckSudokuSolvable(sudoku, nextCellI, nextCellJ)
 	}
 
 	return ans
 }
 
-// Check if it is a valid one or not
-// TODO : do unit testing if required
+// TODO : do unit testing using testing package
 func checkIsValidToInsertCellValue(sudoku [][]int, i int, j int, val int) bool {
 
-	for it := 0; it < 9; it++ { // for all 9 rows
+	// Check If i can insert value in given row
+	for it := 0; it < 9; it++ {
 		if sudoku[i][it] == val {
 			return false
 		}
 	}
 
-	// Check Column
-	for it := 0; it < 9; it++ { // for all 9 rows
+	// Check If i can insert value in given column
+	for it := 0; it < 9; it++ {
 		if sudoku[it][j] == val {
 			return false
 		}
 	}
 
+	/*
+		Total Boxes in sudoku : 9 of size 3*3
+		using boxI and boxJ we can get combinations like 00, 01,... 22 => giving 9 boxes.
+	*/
 	boxI := i / 3
-	boxJ := j / 3 // both can be either 0,1,2 // which makes combinations of 00, 01, 02 ... 9 comb -> 9 boxes
+	boxJ := j / 3
 
 	for it := boxI * 3; it < boxI*3+3; it++ { // outer row
 		for jt := boxJ * 3; jt < boxJ*3+3; jt++ {
@@ -232,6 +282,7 @@ func nextCell(i int, j int) (int, int) {
 	}
 }
 
+// check if last cell of sudoku
 func isLastCell(i int, j int) bool {
 	if i == 8 && j == 8 {
 		return true
@@ -240,6 +291,7 @@ func isLastCell(i int, j int) bool {
 	return false
 }
 
+// Print sudoku
 func printSudoku(sudoku [][]int) {
 
 	fmt.Println("")
