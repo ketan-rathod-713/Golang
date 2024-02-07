@@ -13,6 +13,7 @@ type User struct {
 	Address Address `json:"address"`
 }
 
+// Address of User
 type Address struct {
 	Area    string `json:"area"`
 	Country string `json:"country"`
@@ -24,12 +25,13 @@ type Tech struct {
 	TechDetail []TechDetail `json:"techDets"`
 }
 
+// TechDetail of Tech
 type TechDetail struct {
 	Tech string  `json:"tech"`
 	Exp  float64 `json:"exp"`
 }
 
-// for final output Marshaling
+// used for final output Marshaling
 type TechDetailFinal struct {
 	Tech string  `json:"techdata"`
 	Exp  float64 `json:"exp"`
@@ -41,6 +43,7 @@ type Contact struct {
 	ContactDetails ContactDetails `json:"contactDets"`
 }
 
+// ContactDetails for Contact information
 type ContactDetails struct {
 	Email string `json:"email"`
 	Phone Phone  `json:"phone"`
@@ -56,24 +59,18 @@ type UserInfo struct {
 	Phone       Phone             `json:"Phone"`
 }
 
-// Special marshal logic for phone
-
 type Phone string
 
-// func (p Phone) MarshalJSON() ([]byte, error) {
-// 	return json.Marshal(fmt.Sprintf("+91-%v", p))
-// }
-
-// do marshal on userInfo // Data structure to json creation
+// Map for storing country code wrt to country
 var COUNTRY_CODE map[string]string = map[string]string{
 	"IND": "+91",
 	"UK":  "+41",
 }
 
-func (u *UserInfo) MarshalJSON() ([]byte, error) { // With Pointers it will work
+// Custom marshaling logic for UserInfo : Update country code in Phone depending on Country of user.
+func (u *UserInfo) MarshalJSON() ([]byte, error) {
+	// Update Country Code Before Marshaling
 	countryCode := COUNTRY_CODE[u.Address.Country]
-
-	// Pre-processing before marshaling:
 	u.Phone = Phone(fmt.Sprintf("%v-%v", countryCode, u.Phone))
 
 	type UserInfo2 UserInfo              // creating different type
@@ -83,6 +80,7 @@ func (u *UserInfo) MarshalJSON() ([]byte, error) { // With Pointers it will work
 }
 
 func main() {
+	// Read All 3 Files and get output in structs
 
 	userFile, err := os.ReadFile("user.json")
 
@@ -160,16 +158,16 @@ func main() {
 		panic(err)
 	}
 
-	WriteJSONToFile(userInfoBytes)
+	WriteJSONToFile(userInfoBytes, "result.json")
 
 	// Alternative 2
-	// can we do it using map // store information got in map and update it
 
 }
 
-func WriteJSONToFile(jsonBytes []byte) error {
-	err := os.WriteFile("result.json", jsonBytes, os.FileMode(0644))
-	fmt.Println("\nFinal Output is in result.json\n")
+// Writting given jsonBytes to file
+func WriteJSONToFile(jsonBytes []byte, fileName string) error {
+	err := os.WriteFile(fileName, jsonBytes, os.FileMode(0644))
+	fmt.Printf("\nFinal Output is in %v\n", fileName)
 
 	return err
 }
