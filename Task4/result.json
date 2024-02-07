@@ -8,11 +8,11 @@
         },
         "TechDetails": [
             {
-                "techdata": "",
+                "techdata": "React",
                 "exp": 3
             },
             {
-                "techdata": "",
+                "techdata": "Golang",
                 "exp": 1.5
             }
         ],
@@ -28,11 +28,11 @@
         },
         "TechDetails": [
             {
-                "techdata": "",
+                "techdata": "Vue",
                 "exp": 0.9
             },
             {
-                "techdata": "",
+                "techdata": "Golang",
                 "exp": 1.5
             }
         ],
@@ -48,7 +48,7 @@
         },
         "TechDetails": [
             {
-                "techdata": "",
+                "techdata": "Golang",
                 "exp": 0.3
             }
         ],
@@ -64,7 +64,7 @@
         },
         "TechDetails": [
             {
-                "techdata": "",
+                "techdata": "Golang",
                 "exp": 0.3
             }
         ],
