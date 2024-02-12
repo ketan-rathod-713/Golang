@@ -17,6 +17,6 @@ Utilise Previously Made UserForm In Task1 to make a post request on server which
 2. Configure Postgresql And Change URL of type const in main.go ( add your username and password )
 3. Execute initialize.sql once in your database ( it will create table for us)
 4. cd Task5
-5. go run main.go
+5. go run server.go
 
 It would start our http server and now we can go to `localhost:8080` to view our fuctionality being served. 
