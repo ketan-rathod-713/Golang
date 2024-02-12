@@ -10,6 +10,8 @@ import (
 	_ "github.com/lib/pq"
 )
 
+const URL = "postgres://bacancy:admin@localhost/bacancy?sslmode=disable"
+
 type User struct { // if * then it can result in nil pointer reference when using with scan
 	Id          string
 	FirstName   string
@@ -27,7 +29,7 @@ type Student struct {
 var db *sql.DB = ConnectDb()
 
 func ConnectDb() *sql.DB {
-	db, err := sql.Open("postgres", "postgres://bacancy:admin@localhost/bacancy?sslmode=disable")
+	db, err := sql.Open("postgres", URL)
 	CheckError(err)
 
 	// defer db.Close()
