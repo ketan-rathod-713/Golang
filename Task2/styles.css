@@ -1,0 +1,158 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: sans-serif;
+  font-weight: bold;
+}
+
+body {
+  background-color: #ededed;
+}
+
+.table_body {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+table {
+  /* width: 100%; */
+  padding: 10px 30px;
+/*  understand it -> why it affecting selected row      */
+  table-layout: fixed;
+  border-spacing: 0 10px;
+  color: #787878;
+  gap: 10px;
+}
+
+table tr th:nth-child(1){
+width: 25%;
+}
+
+table tr th:nth-child(2){
+width: 10%;
+}
+
+table tr th:nth-child(3){
+width: 15%;
+}
+
+table tr th:nth-child(4){
+width: 5%;
+}
+
+table tr th:nth-child(5){
+width: 10%;
+}
+
+table tr th:nth-child(6){
+width: 10%;
+}
+
+table tr th:nth-child(7){
+width: 10%;
+}
+
+table tr th:nth-child(8){
+width: 10%;
+}
+
+
+
+table > tbody > tr {
+  outline: thin solid grey;
+background-color: white;
+border-radius: 2px;
+
+}
+
+table th {
+text-align: center;
+padding: 15px 15px;
+margin-bottom: 20px;
+border-bottom: 2px solid grey;
+}
+
+table td {
+color: rgb(106, 106, 106);
+height: 100%;
+padding: 15px 15px;
+font-size: 17px;
+text-align: center;
+vertical-align:middle;
+}
+
+.selected-row {
+outline: 3px solid rgb(0, 211, 0);
+outline-style: groove;
+
+}
+
+
+table tr td .account-name {
+display: flex;
+gap: 10px;
+justify-content: center;
+align-items: center;
+min-width: 200px;
+}
+
+.account-name img {
+  width: 20px;
+  height: 20px;
+}
+
+.account-name img[src="unchecked.svg"]{
+  width: 25px;
+  height: 25px;
+}
+
+
+/* for second column  */
+td:nth-child(2) {
+font-weight: bold;
+}
+
+td:nth-child(7) div{
+  display: flex;
+  gap: 8px;
+}
+
+td:nth-child(7) div img {
+  height: 20px;
+  width: 20px;
+  transform: rotate(12deg);
+}
+
+td:nth-child(8) > div{
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+} 
+
+td:nth-child(9) img{
+  width: 20px;
+  height: 20px;
+  }
+
+.green-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background-color: green;
+  border-radius: 50%;
+}
+
+.grey-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background-color: grey;
+  border-radius: 50%;
+}
+
+/*      tr {
+  border: 2px solid red;
+} */
+/* why, can't we add classes and all that in semantic tags ?? */ 
