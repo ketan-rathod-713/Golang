@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Form Task1</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+            font-family: sans-serif;
+        }
+
+        input[type=button] {
+            border: none;
+            background: none;
+            outline: none;
+            box-shadow: none;
+        }
+
+        main {
+            padding: 50px 0px;
+        }
+
+        main>.heading {
+            text-align: center;
+            padding: 10px 0px;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /*   border: 2px solid red; */
+            gap: 20px;
+        }
+
+        form>.form-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        form>.form-item>input {
+            padding: 5px 10px;
+            width: 400px;
+            font-size: 17px;
+            color: grey;
+        }
+
+        form>.form-item>input[type=button] {
+            background-color: blue;
+            color: white;
+            border-radius: 2px;
+            cursor: pointer;
+        }
+
+        label {
+            font-size: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <h1 class="heading">User Form</h1>
+        <form>
+            <div class="form-item">
+                <label>First Name</label>
+                <input type="text" placeholder="Enter First Name" />
+            </div>
+            <div class="form-item">
+                <label>Last Name</label>
+                <input type="text" placeholder="Enter Last Name" />
+            </div>
+            <div class="form-item">
+                <label>Date Of Birth</label>
+                <input type="date" placeholder="Enter Date Of Birth" />
+            </div>
+            <div class="form-item">
+                <label>Email</label>
+                <input type="email" placeholder="Enter Email" />
+            </div>
+            <div class="form-item">
+                <label>Mobile Number</label>
+                <input type="phone" placeholder="Enter Mobile Number" />
+            </div>
+            <div class="form-item">
+                <input type="button" value="Submit" />
+            </div>
+        </form>
+    </main>
+</body>
+
+</html>
