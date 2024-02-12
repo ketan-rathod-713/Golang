@@ -4,13 +4,12 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"main/database"
 	"net/http"
 	"text/template"
 
 	_ "github.com/lib/pq"
 )
-
-const URL = "postgres://bacancy:admin@localhost/bacancy?sslmode=disable"
 
 type User struct { // if * then it can result in nil pointer reference when using with scan
 	Id          string
@@ -26,18 +25,7 @@ type Student struct {
 	Age  int
 }
 
-var db *sql.DB = ConnectDb()
-
-func ConnectDb() *sql.DB {
-	db, err := sql.Open("postgres", URL)
-	CheckError(err)
-
-	// defer db.Close()
-
-	CheckError(db.Ping())
-
-	return db
-}
+var db *sql.DB = database.ConnectDb()
 
 func main() {
 	// File Server To host static files.
