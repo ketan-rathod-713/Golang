@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users Registered</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+        body {
+            padding: 30px;
+            background-color: rgb(233, 233, 233);
+        }
+        table {
+            width: 100%;
+            padding: 20px;
+            border-collapse: collapse;
+            outline: 2px solid rgb(112, 112, 112);
+        }
+
+        /* table tr {
+            border-bottom: 3px solid red;
+        } */
+        table th {
+            font-size: 22px;
+            font-family: sans-serif;
+            text-align: left;
+            letter-spacing: 1px;
+            padding: 10px 5px;
+            background-color: gray;
+            color: white;
+        }
+
+        table td {
+            padding: 5px;
+            font-size: 20px;
+            font-family: sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <table>
+        <thead>
+            <tr>
+                <th>Id</td>
+                <th>FirstName</th>
+                <th>LastName</th>
+                <th>DateOfBirth</th>
+                <th>Phone</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+    <tbody>
+    {{range .}}
+    <tr>
+        <td>{{.Id}}</td>
+        <td>{{.FirstName}}</td>
+        <td>{{.LastName}}</td>
+        <td>{{.DateOfBirth}}</td>
+        <td>{{.Phone}}</td>
+        <td>{{.Email}}</td>
+    </tr>
+    {{end}}
+</tbody>
+</table>
+</body>
+</html>
