@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"main/database"
 	"net/http"
@@ -25,9 +24,13 @@ type Student struct {
 	Age  int
 }
 
-var db *sql.DB = database.ConnectDb()
+// Global db variable for database operations
+var db *sql.DB
 
 func main() {
+
+	db = database.ConnectDb()
+
 	// File Server To host static files.
 	fs := http.FileServer(http.Dir("static"))
 	http.Handle("/", fs) //TODO: StripPrefix creates a new handler. And how it will see it relative to our folder and price.
@@ -39,6 +42,8 @@ func main() {
 	http.HandleFunc("/users", usersDataHandler)
 
 	log.Fatal(http.ListenAndServe(":8080", nil)) // Here nil  because we are setting up http2 here hence no need to define it.
+
+	log.Println("Server Started On Port :8080")
 }
 
 // Show All The Users Data To Client
@@ -65,8 +70,6 @@ func usersDataHandler(w http.ResponseWriter, r *http.Request) {
 		users = append(users, user)
 	}
 
-	// fmt.Fprintln(w, "Users Data")
-
 	t, err := template.ParseFiles("users.html")
 
 	if err != nil {
@@ -78,15 +81,17 @@ func usersDataHandler(w http.ResponseWriter, r *http.Request) {
 
 // Handles Post Request To get Form data and insert it to database
 func formHandler(w http.ResponseWriter, r *http.Request) {
+
+	// Form Data Upload Post Request
 	if r.Method == http.MethodPost {
 
 		// Parse Form
 		if err := r.ParseForm(); err != nil {
-			fmt.Fprintf(w, "ParseForm err: %v", err)
+			http.Error(w, "Error Occured During Parsing", http.StatusBadRequest)
 			return
 		}
 
-		fmt.Println("Post Request Successfull")
+		log.Println("POST SUCCESS")
 
 		firstname := r.FormValue("firstname")
 		lastname := r.FormValue("lastname")
@@ -94,7 +99,7 @@ func formHandler(w http.ResponseWriter, r *http.Request) {
 		email := r.FormValue("email")
 		phone := r.FormValue("phone")
 
-		fmt.Println(firstname, lastname, dateofbirth, email, phone)
+		log.Println("GOT", firstname, lastname, dateofbirth, email, phone)
 
 		// Now connected hence submit form // yahi pe stop ho jao
 		err := submitForm(firstname, lastname, dateofbirth, email, phone)
@@ -109,18 +114,8 @@ func formHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func CheckError(err error) {
-	if err != nil {
-		panic(err)
-	}
-}
-
 func submitForm(firstname string, lastname string, dateofbirth string, email string, phone string) error {
-
-	// connection to he hi ha ha
 	query := `INSERT INTO httpnet.user(firstname, lastname, dateofbirth, email, phone) VALUES($1, $2, $3, $4, $5);`
-
-	// start transaction here TODO:
 
 	_, err := db.Exec(query, firstname, lastname, dateofbirth, email, phone)
 	if err != nil {
