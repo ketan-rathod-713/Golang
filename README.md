@@ -86,6 +86,16 @@ Utilise Previously Made UserForm In Task1 to make a post request on server which
 - Define Routes using HandleFunc function and serve html templates using html/template library.
 
 ### Running Code
+
+Add .env file to ./Task5 , It should look like
+
+```DB_USER="bacancy" 
+DB_USER_PASSWORD="admin"
+DATABASE="bacancy"
+HOST="localhost"
+PORT="8081"
+DB_PORT="5432"```
+
 1. Clone this repo
 2. Configure Postgresql And Change URL of type const in main.go ( add your username and password )
 3. Execute initialize.sql once in your database ( it will create table for us)
