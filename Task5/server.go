@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"main/database"
 	"net/http"
@@ -28,8 +29,11 @@ type Student struct {
 var db *sql.DB
 
 func main() {
+	// Load Env Variables
+	config := &database.DBConfig{}
 
-	db = database.ConnectDb()
+	// Connect To Database and update config with environment variables
+	db = database.ConnectDb(config)
 
 	// File Server To host static files.
 	fs := http.FileServer(http.Dir("static"))
@@ -41,9 +45,9 @@ func main() {
 	// Users Data Handler
 	http.HandleFunc("/users", usersDataHandler)
 
-	log.Fatal(http.ListenAndServe(":8080", nil)) // Here nil  because we are setting up http2 here hence no need to define it.
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", config.PORT), nil)) // Here nil  because we are setting up http2 here hence no need to define it.
 
-	log.Println("Server Started On Port :8080")
+	log.Printf("Server Started On Port :%v", config.PORT)
 }
 
 // Show All The Users Data To Client
