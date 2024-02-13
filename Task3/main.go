@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 )
 
 type SudokuData struct {
@@ -104,32 +105,32 @@ var Sudokus []SudokuData = []SudokuData{
 }
 
 func main() {
-	fmt.Println("Welcome To Sudoku Solver")
+	log.Println("Welcome To Sudoku Solver")
 	/* Test All Sudoku */
 	for _, sudoku := range Sudokus {
 		validityOfSudoku, row, col := CheckValidSudoku(sudoku.Sudoku)
 		if validityOfSudoku {
 			ans := CheckSudokuSolvable(&sudoku.Sudoku, 0, 0)
 			if ans {
-				fmt.Println("Below Sudoku is Solvable")
+				log.Println("Below Sudoku is Solvable")
 			} else {
-				fmt.Println("Below Sudoku is Not Solvable")
+				log.Println("Below Sudoku is Not Solvable")
 			}
 			printSudoku(sudoku.Sudoku)
 		} else {
-			fmt.Println("Invalid Sudoku Provided, See Below")
-			fmt.Printf("It Produces Error On Row %v and Column %v \n", row, col)
+			log.Println("Invalid Sudoku Provided, See Below")
+			log.Printf("It Produces Error On Row %v and Column %v \n", row, col)
 			printSudoku(sudoku.Sudoku)
 		}
 	}
 }
 
 /*
-	Checks if sudoku is valid or not
-	Using Set
-	Returns (isValid, Row, Column)
-	Row == -1 and Column == -1 if valid sudoku
-	else it will point to the cell which producing error
+Checks if sudoku is valid or not
+Using Set
+Returns (isValid, Row, Column)
+Row == -1 and Column == -1 if valid sudoku
+else it will point to the cell which producing error
 */
 func CheckValidSudoku(sudoku [][]int) (bool, int, int) {
 	// check all 3 condtions
@@ -201,8 +202,8 @@ func CheckValidSudoku(sudoku [][]int) (bool, int, int) {
 }
 
 /*
-	Checks if valid sudoku is solvable or not
-	Using backtracking
+Checks if valid sudoku is solvable or not
+Using backtracking
 */
 func CheckSudokuSolvable(sudoku *[][]int, i int, j int) bool {
 
@@ -298,8 +299,8 @@ func checkIsValidToInsertCellValue(sudoku [][]int, i int, j int, val int) bool {
 }
 
 /*
-	It returns the next cell of sudoku to search
-	for eg. nextCell(1, 8) will return (2, 0) (Assumption : Iterating row by row)
+It returns the next cell of sudoku to search
+for eg. nextCell(1, 8) will return (2, 0) (Assumption : Iterating row by row)
 */
 func nextCell(i int, j int) (int, int) {
 	if j == 8 {
