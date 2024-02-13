@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 )
 
@@ -82,49 +83,49 @@ func (u *UserInfo) MarshalJSON() ([]byte, error) {
 func main() {
 	// Read All 3 Files and get output in structs
 
-	userFile, err := os.ReadFile("user.json")
+	userFile, err := os.ReadFile("data/user.json")
 
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	var users []User
 	err = json.Unmarshal([]byte(userFile), &users)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	// got data in user
 	// fmt.Println(users)
 
 	// Same for Tech
-	techFile, err := os.ReadFile("tech.json")
+	techFile, err := os.ReadFile("data/tech.json")
 
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	var techs []Tech
 	err = json.Unmarshal([]byte(techFile), &techs)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	// got data in user
-	fmt.Println(techs)
+	log.Println(techs)
 
 	// Same for contact.json
-	contactFile, err := os.ReadFile("contact.json")
+	contactFile, err := os.ReadFile("data/contact.json")
 
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	var contacts []Contact
 	err = json.Unmarshal([]byte(contactFile), &contacts)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	// got data in user
-	// fmt.Println(contacts)
+	// log.Println(contacts)
 
 	// Now merge all
 	// Simple Join of users, contacts, and techs
@@ -137,10 +138,10 @@ func main() {
 
 					// modify tech details
 					// Transform TechDetail into TechDetailFinal
-					fmt.Println("Tech details", tech.TechDetail)
+					log.Println("Tech details", tech.TechDetail)
 					var techFinalDetails []TechDetailFinal
 					for _, t := range tech.TechDetail {
-						fmt.Println(t)
+						log.Println(t)
 						techFinalDetails = append(techFinalDetails, TechDetailFinal{t.Tech, t.Exp})
 					}
 
@@ -151,7 +152,7 @@ func main() {
 		}
 	}
 
-	fmt.Println(userInfos)
+	log.Println(userInfos)
 
 	userInfoBytes, err := json.Marshal(userInfos)
 	if err != nil {
@@ -167,7 +168,7 @@ func main() {
 // Writting given jsonBytes to file
 func WriteJSONToFile(jsonBytes []byte, fileName string) error {
 	err := os.WriteFile(fileName, jsonBytes, os.FileMode(0644))
-	fmt.Printf("\nFinal Output is in %v\n", fileName)
+	log.Printf("\nFinal Output is in %v\n", fileName)
 
 	return err
 }

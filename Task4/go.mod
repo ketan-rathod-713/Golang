@@ -1,3 +1,3 @@
-module task4json
+module main
 
 go 1.21.6
