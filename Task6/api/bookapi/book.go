@@ -4,7 +4,10 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 	"task6MuxGorm/models"
+
+	"github.com/gorilla/mux"
 )
 
 // Create/ Define API Handlers // REST API Standards (TODO: see it)
@@ -78,5 +81,18 @@ func (b *bookApi) UpdateBook(w http.ResponseWriter, r *http.Request) {
 
 // DELETE /bools/{id}
 func (b *bookApi) DeleteBook(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("API HANDLED"))
+	id := mux.Vars(r)["id"]
+
+	id_int, err := strconv.Atoi(id)
+
+	// GIVE RESPONSE
+	w.Header().Set("Content-Type", "application/json")
+	if err != nil {
+		w.Write([]byte(`{"error": "Error getting id of type uint"}`))
+	}
+	bk, err := b.Service.DeleteBook(uint(id_int))
+	if err != nil {
+		w.Write([]byte(`{"error": "Error deleting data of given id"}`))
+	}
+	json.NewEncoder(w).Encode(bk)
 }

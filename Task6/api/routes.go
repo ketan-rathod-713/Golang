@@ -30,11 +30,8 @@ func (api *Api) InitialiseRoutes(router *mux.Router) {
 	// get particular service information from api instance // as it will be storing all services information // hence i can add routes to that services
 
 	// CREATE NEW BOOK API TO ACCESS ALL HANDLERS ON IT TODO: IMP
-	bookApi := bookapi.NewBookApi(api.App)
 
-	router.HandleFunc("/book", bookApi.CreateBook).Methods("POST")
-	router.HandleFunc("/book", bookApi.GetBooks).Methods("GET")
-	router.HandleFunc("/book/{id}", bookApi.GetOneBook).Methods("GET")
-	router.HandleFunc("/book/{id}", bookApi.DeleteBook).Methods("DELETE")
-	router.HandleFunc("/book", bookApi.UpdateBook).Methods("PUT")
+	bookRouter := router.PathPrefix("/book").Subrouter()
+	bookapi.Routes(bookRouter, api.App)
+	// Similarly Define other routes
 }

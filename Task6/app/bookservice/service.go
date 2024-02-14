@@ -13,7 +13,7 @@ type Service interface {
 	CreateBook(book *models.Book) (*models.Book, error)
 	GetBooks() ([]*models.Book, error)
 	UpdateBook(book *models.Book) (*models.Book, error)
-	DeleteBook(book *models.Book) (*models.Book, error)
+	DeleteBook(id uint) (*models.Book, error)
 }
 
 // This service only requires DB connection for doing its job
@@ -48,8 +48,12 @@ func (s *service) UpdateBook(book *models.Book) (*models.Book, error) {
 	return book, nil
 }
 
-func (s *service) DeleteBook(book *models.Book) (*models.Book, error) {
-
+func (s *service) DeleteBook(id uint) (*models.Book, error) {
+	book := &models.Book{}
+	book.ID = id
+	s.DB.Delete(book)
 	log.Println("book deleted", *book)
 	return book, nil
 }
+
+// TODO: Implement Error Handling at service level
