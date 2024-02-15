@@ -26,14 +26,15 @@ type App struct {
 	dump all required data in App and return it.
 */
 func NewApp() (app *App, err error) {
+	config := loadEnv()
 	var db *gorm.DB
-	db, err = database.InitialiseDB()
+	db, err = database.InitialiseDB(config)
 
 	if err != nil {
 		return nil, err
 	}
 
-	app = &App{DB: db, Config: loadEnv()}
+	app = &App{DB: db, Config: config}
 
 	// After Getting Config And DB initialise and automigrate some stuff
 	schemaQuery := fmt.Sprintf("CREATE SCHEMA IF NOT EXISTS %v", app.Config.DB_SCHEMA_NAME)

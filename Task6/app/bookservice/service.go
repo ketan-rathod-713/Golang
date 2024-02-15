@@ -94,8 +94,6 @@ for given data, update book entry in books table.
 */
 func (s *service) UpdateBook(book *models.Book) (*models.Book, error) {
 	// update book
-	if book.ID 
-
 	result := s.DB.Save(book)
 
 	if result.Error != nil || result.RowsAffected == 0 {
