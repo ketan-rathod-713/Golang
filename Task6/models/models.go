@@ -11,7 +11,7 @@ type Book struct {
 	gorm.Model
 	Title     string `json:"title"`
 	Author    string `json:"author"`
-	ISBN      string `json:"isbn" gorm:"primaryKey"`
+	ISBN      string `json:"isbn" gorm:"unique"`
 	Publisher string `json:"publisher"`
 	Year      int    `json:"year"`
 	Genre     string `json:"genre"`

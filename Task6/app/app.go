@@ -11,13 +11,20 @@ import (
 	"gorm.io/gorm"
 )
 
-// App will hold DB connection which can be used in whole app
+/* 
+	App will hold important config data for whole application needs.
+*/
 type App struct {
 	DB     *gorm.DB
 	Config *models.Config
 }
 
-// Connect To Database and return App object
+/* 
+	connection to database
+	automigrate schema, tables.
+	load environment variables
+	dump all required data in App and return it.
+*/
 func NewApp() (app *App, err error) {
 	var db *gorm.DB
 	db, err = database.InitialiseDB()
@@ -44,6 +51,10 @@ func NewApp() (app *App, err error) {
 	return app, nil
 }
 
+/* 
+	load environment variables from .env file.
+	it can be used by using os.Getenv function.
+*/
 func loadEnv() *models.Config {
 	err := godotenv.Load()
 	if err != nil {

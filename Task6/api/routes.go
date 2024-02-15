@@ -1,6 +1,8 @@
 package api
 
 import (
+	"encoding/json"
+	"net/http"
 	"task6MuxGorm/api/bookapi"
 	"task6MuxGorm/app"
 	"task6MuxGorm/app/bookservice"
@@ -11,7 +13,7 @@ import (
 type Api struct {
 	App         *app.App
 	BookService bookservice.Service // API HANDLERS ARE INDEPENDED BUT WE NEED SERVICES HERE SO THAT WE CAN ACCESS IT INSIDE HANDLERS :)
-	// Other Services
+	// TODO: new services will come here
 }
 
 func NewApi(app *app.App) (myApi *Api, err error) {
@@ -24,14 +26,25 @@ func NewApi(app *app.App) (myApi *Api, err error) {
 }
 
 func (api *Api) InitialiseRoutes(router *mux.Router) {
-	// Define All Routes
-	// Also require DB means define it for particular api instance
 
-	// get particular service information from api instance // as it will be storing all services information // hence i can add routes to that services
+	// TODO: Define All Handlers Here
+	// ALTERNATIVE : Define ALl book related handlers in bookapi and call it from here.
 
-	// CREATE NEW BOOK API TO ACCESS ALL HANDLERS ON IT TODO: IMP
+	// GET / : Home Handler
+	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
 
+		json.NewEncoder(w).Encode(map[string]string{
+			"status":  "ok",
+			"message": "Welcome to task6 gorm crud",
+		})
+
+	}).Methods("GET")
+
+	/* Book Api */
 	bookRouter := router.PathPrefix("/book").Subrouter()
 	bookapi.Routes(bookRouter, api.App)
-	// Similarly Define other routes
+
+	/* Other Api */
+	// other api's will be defined here.
 }
