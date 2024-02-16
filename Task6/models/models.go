@@ -1,8 +1,14 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"fmt"
 
-const SCHEMA = "task6muxgorm"
+	"gorm.io/gorm"
+)
+
+// TODO: Take this Schema from env files
+
+var SCHEMA = "task6muxgorm"
 
 // Book struct represents a book with its title, author, ISBN, publisher, year, genre
 
@@ -19,5 +25,5 @@ type Book struct {
 
 // Define Book Table Inside books Schema // TODO: How to get schema directly here from any utils package or like that.
 func (b Book) TableName() string {
-	return SCHEMA + ".books"
+	return fmt.Sprintf("%v.books", SCHEMA)
 }
