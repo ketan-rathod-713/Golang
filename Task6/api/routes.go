@@ -25,26 +25,38 @@ func NewApi(app *app.App) (myApi *Api, err error) {
 	return myApi, nil
 }
 
+func homeHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	json.NewEncoder(w).Encode(map[string]string{
+		"status":  "ok",
+		"message": "Welcome to task6 gorm crud",
+	})
+}
+
+func catchAllHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	json.NewEncoder(w).Encode(map[string]string{
+		"status":  "ok",
+		"message": "Invalid URL and METHOD",
+	})
+}
+
 func (api *Api) InitialiseRoutes(router *mux.Router) {
 
 	// TODO: Define All Handlers Here
 	// ALTERNATIVE : Define ALl book related handlers in bookapi and call it from here.
 
-	// GET / : Home Handler
-	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-
-		json.NewEncoder(w).Encode(map[string]string{
-			"status":  "ok",
-			"message": "Welcome to task6 gorm crud",
-		})
-
-	}).Methods("GET")
-
 	/* Book Api */
 	bookRouter := router.PathPrefix("/book").Subrouter()
 	bookapi.Routes(bookRouter, api.App)
 
+	// GET / : Home Handler
+	router.HandleFunc("/", homeHandler).Methods("GET")
+
+	// Catch All other Url and send invalid response
+	router.PathPrefix("/").Handler(http.HandlerFunc(catchAllHandler))
 	/* Other Api */
 	// other api's will be defined here.
 }

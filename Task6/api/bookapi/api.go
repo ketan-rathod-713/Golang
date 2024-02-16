@@ -35,5 +35,5 @@ func Routes(router *mux.Router, app *app.App) {
 	router.HandleFunc("/", bookApi.GetBooks).Methods("GET")
 	router.HandleFunc("/{id}", bookApi.GetOneBookById).Methods("GET")
 	router.HandleFunc("/{id}", bookApi.DeleteBook).Methods("DELETE")
-	router.HandleFunc("/", bookApi.UpdateBook).Methods("PUT")
+	router.HandleFunc("/", bookApi.UpdateBook).Methods("PUT") // body should include Id else upsert operation
 }
