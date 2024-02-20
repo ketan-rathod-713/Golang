@@ -1,4 +1,4 @@
-package bookapi
+package userapi
 
 import (
 	"encoding/json"
@@ -24,20 +24,20 @@ func JSONError(w http.ResponseWriter, err *models.ApiError) {
 	json.NewEncoder(w).Encode(err)
 }
 
-// POST /books
-func (b *bookApi) CreateBook(w http.ResponseWriter, r *http.Request) {
+// POST /user
+func (u *userApi) CreateUser(w http.ResponseWriter, r *http.Request) {
 	// TODO: Get JSON data and decode it
-	var book models.Book
-	err := json.NewDecoder(r.Body).Decode(&book)
+	var user models.User
+	err := json.NewDecoder(r.Body).Decode(&user)
 
 	if err != nil {
 		JSONError(w, ERROR_DECODING_JSON)
 		return
 	}
 
-	log.Println(book)
-	// TODO: call service of creating book
-	bk, err := b.Service.CreateBook(&book)
+	log.Println(user)
+	// TODO: call service of creating user
+	bk, err := u.Service.CreateUser(&user)
 
 	if err != nil {
 		JSONError(w, ERROR_POST_REQ)
@@ -49,9 +49,9 @@ func (b *bookApi) CreateBook(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(bk)
 }
 
-// GET /books
-func (b *bookApi) GetBooks(w http.ResponseWriter, r *http.Request) {
-	books, err := b.Service.GetBooks()
+// GET /user
+func (u *userApi) GetUsers(w http.ResponseWriter, r *http.Request) {
+	users, err := u.Service.GetUsers()
 
 	if err != nil {
 		JSONError(w, ERROR_GET_REQ)
@@ -59,11 +59,11 @@ func (b *bookApi) GetBooks(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(books)
+	json.NewEncoder(w).Encode(users)
 }
 
-// GET /books/{id}
-func (b *bookApi) GetOneBookById(w http.ResponseWriter, r *http.Request) {
+// GET /user/{id}
+func (u *userApi) GetOneUserById(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(mux.Vars(r)["id"])
 
 	if err != nil {
@@ -71,7 +71,7 @@ func (b *bookApi) GetOneBookById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	book, err := b.Service.GetOneBookById(uint64(id))
+	user, err := u.Service.GetOneUserById(uint64(id))
 
 	if err != nil {
 		JSONError(w, ERROR_GET_REQ)
@@ -79,22 +79,22 @@ func (b *bookApi) GetOneBookById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(book)
+	json.NewEncoder(w).Encode(user)
 }
 
-// PUT /books/{id}
-func (b *bookApi) UpdateBook(w http.ResponseWriter, r *http.Request) {
-	var book models.Book
-	err := json.NewDecoder(r.Body).Decode(&book)
+// PUT /user/{id}
+func (u *userApi) UpdateUser(w http.ResponseWriter, r *http.Request) {
+	var user models.User
+	err := json.NewDecoder(r.Body).Decode(&user)
 
 	if err != nil {
 		JSONError(w, ERROR_DECODING_JSON)
 		return
 	}
 
-	log.Println(book)
+	log.Println(user)
 
-	bk, err := b.Service.UpdateBook(&book)
+	bk, err := u.Service.UpdateUser(&user)
 
 	if err != nil {
 		JSONError(w, &models.ApiError{Code: 500, Message: "Error Updating Data For given id"})
@@ -105,8 +105,8 @@ func (b *bookApi) UpdateBook(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(bk)
 }
 
-// DELETE /bools/{id}
-func (b *bookApi) DeleteBook(w http.ResponseWriter, r *http.Request) {
+// DELETE /user/{id}
+func (u *userApi) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 
 	id_int, err := strconv.Atoi(id)
@@ -115,9 +115,32 @@ func (b *bookApi) DeleteBook(w http.ResponseWriter, r *http.Request) {
 		JSONError(w, ERROR_DECODING_JSON)
 		return
 	}
-	bk, err := b.Service.DeleteBook(uint64(id_int))
+	bk, err := u.Service.DeleteUser(uint64(id_int))
 	if err != nil {
 		JSONError(w, &models.ApiError{Code: 500, Message: "Error Deleting Data For given id"})
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(bk)
+}
+
+// POST /book/
+func (u *userApi) IssueBook(w http.ResponseWriter, r *http.Request) {
+	bookId := mux.Vars(r)["bookId"]
+	userId := mux.Vars(r)["userId"]
+
+	bookId_int, err := strconv.Atoi(bookId)
+	userId_int, err := strconv.Atoi(userId)
+
+	if err != nil {
+		JSONError(w, ERROR_DECODING_JSON)
+		return
+	}
+
+	bk, err := u.Service.IssueBook(uint64(userId_int), uint64(bookId_int))
+	if err != nil {
+		JSONError(w, &models.ApiError{Code: 500, Message: err.Error()})
 		return
 	}
 

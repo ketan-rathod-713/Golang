@@ -11,19 +11,19 @@ import (
 	"gorm.io/gorm"
 )
 
-/* 
-	App will hold important config data for whole application needs.
+/*
+App will hold important config data for whole application needs.
 */
 type App struct {
 	DB     *gorm.DB
 	Config *models.Config
 }
 
-/* 
-	connection to database
-	automigrate schema, tables.
-	load environment variables
-	dump all required data in App and return it.
+/*
+connection to database
+automigrate schema, tables.
+load environment variables
+dump all required data in App and return it.
 */
 func NewApp() (app *App, err error) {
 	config := loadEnv()
@@ -44,7 +44,7 @@ func NewApp() (app *App, err error) {
 		return app, result.Error
 	}
 
-	err = db.AutoMigrate(&models.Book{})
+	err = db.AutoMigrate(&models.Book{}, &models.User{})
 	if err != nil {
 		return app, err
 	}
@@ -52,9 +52,9 @@ func NewApp() (app *App, err error) {
 	return app, nil
 }
 
-/* 
-	load environment variables from .env file.
-	it can be used by using os.Getenv function.
+/*
+load environment variables from .env file.
+it can be used by using os.Getenv function.
 */
 func loadEnv() *models.Config {
 	err := godotenv.Load()

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"task6MuxGorm/api/bookapi"
+	"task6MuxGorm/api/userapi"
 	"task6MuxGorm/app"
 	"task6MuxGorm/app/bookservice"
 
@@ -51,6 +52,10 @@ func (api *Api) InitialiseRoutes(router *mux.Router) {
 	/* Book Api */
 	bookRouter := router.PathPrefix("/book").Subrouter()
 	bookapi.Routes(bookRouter, api.App)
+
+	/* User Api */
+	userRouter := router.PathPrefix("/user").Subrouter()
+	userapi.Routes(userRouter, api.App)
 
 	// GET / : Home Handler
 	router.HandleFunc("/", homeHandler).Methods("GET")

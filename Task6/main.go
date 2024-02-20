@@ -33,4 +33,6 @@ func main() {
 
 	// TODO: Start Server On given router
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", mainApp.Config.PORT), router))
+
+	// test.TestIssueBook()
 }

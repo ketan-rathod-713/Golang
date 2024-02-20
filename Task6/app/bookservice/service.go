@@ -24,9 +24,9 @@ define all services a bookservice needs.
 type Service interface {
 	CreateBook(book *models.Book) (*models.Book, error)
 	GetBooks() ([]*models.Book, error)
-	GetOneBookById(id uint) (*models.Book, error)
+	GetOneBookById(id uint64) (*models.Book, error)
 	UpdateBook(book *models.Book) (*models.Book, error)
-	DeleteBook(id uint) (*models.Book, error)
+	DeleteBook(id uint64) (*models.Book, error)
 }
 
 /*
@@ -78,7 +78,7 @@ func (s *service) GetBooks() ([]*models.Book, error) {
 /*
 for given id, fetch only one entry of book in books table.
 */
-func (s *service) GetOneBookById(id uint) (*models.Book, error) {
+func (s *service) GetOneBookById(id uint64) (*models.Book, error) {
 	var book *models.Book
 	result := s.DB.Where("id = ?", id).Find(&book)
 
@@ -107,7 +107,7 @@ func (s *service) UpdateBook(book *models.Book) (*models.Book, error) {
 /*
 for given id, delete book data in books table.
 */
-func (s *service) DeleteBook(id uint) (*models.Book, error) {
+func (s *service) DeleteBook(id uint64) (*models.Book, error) {
 	book := &models.Book{}
 	book.ID = id
 	result := s.DB.Where("id = ?", id).Unscoped().Delete(book)
