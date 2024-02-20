@@ -1,6 +1,7 @@
 ## Task 6 : MUX - GORM CRUD
 
 This project implements a RESTful API for managing books. It is built using GORM (a Go ORM) for database operations and Mux for routing HTTP requests. The project follows a clean folder structure to maintain code organization.
+- This project is using json web tokens for authentication and authorization.
 
 ## EndPoints
 
