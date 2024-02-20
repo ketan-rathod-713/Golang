@@ -19,6 +19,17 @@ This project implements a RESTful API for managing books. It is built using GORM
 | DELETE    | /book/{id}| Delete One Book   |
 
 
+### 2. /user
+| Method    | Route     | Description       |
+| ----------| --------- | ----------------- |
+| GET       | /user/    | Get All Users     |
+| GET       | /user/{id}| Get One User By Id|
+| POST      | /user/    | Create User       |
+| PUT       | /user/    | Update One User   |
+| DELETE    | /user/{id}| Delete One User   |
+| GET       | /user/{userId}/book/{bookId}| Issue One Book   |
+
+
 ## Example Of Required .env Variables 
 
 ```
