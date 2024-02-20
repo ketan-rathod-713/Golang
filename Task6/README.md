@@ -29,7 +29,6 @@ This project implements a RESTful API for managing books. It is built using GORM
 | DELETE    | /user/{id}| Delete One User   | admin  |
 | GET       | /user/{userId}/book/{bookId}| Issue One Book   | admin |
 
-
 ### 3. /auth
 
 | Method    | Route     | Description       | ACCESS |
@@ -55,3 +54,7 @@ JWT_SECRET="secret"
 2. Clone the repository.
 3. Create a .env file with necessary environment variables.
 4. Run `go run main.go` to start the server.
+
+## Example Api Requests
+
+If you are using thunder client then you can import some api requests using thunderClientApi.json file provided.

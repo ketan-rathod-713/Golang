@@ -1,0 +1,127 @@
+{
+    "client": "Thunder Client",
+    "collectionName": "Task 6 Gorm Books",
+    "dateExported": "2024-02-20T09:56:38.861Z",
+    "version": "1.1",
+    "folders": [],
+    "requests": [
+        {
+            "_id": "c005e99b-e82b-49ed-a808-a69c62d81c0c",
+            "colId": "49f510ff-0f6d-4320-a547-0b69ac4643bd",
+            "containerId": "",
+            "name": "Get all books",
+            "url": "http://localhost:8081/book/",
+            "method": "GET",
+            "sortNum": 10000,
+            "created": "2024-02-19T11:21:58.455Z",
+            "modified": "2024-02-19T11:26:57.906Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "074d782c-c85f-417f-998d-1524416cb0b1",
+            "colId": "49f510ff-0f6d-4320-a547-0b69ac4643bd",
+            "containerId": "",
+            "name": "Post One Book",
+            "url": "http://localhost:8081/book/",
+            "method": "POST",
+            "sortNum": 20000,
+            "created": "2024-02-19T11:24:31.979Z",
+            "modified": "2024-02-20T09:23:53.532Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"title\": \"book\",\n  \"isbn\": \"abcdddffxdsf\",\n  \"quantity\": 6,\n  \"genre\": \"motivational\",\n  \"author\": \"no one\",\n  \"publisher\": \"Book vale\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "e0d3b727-3b8e-4553-80d1-0045514e2a9a",
+            "colId": "49f510ff-0f6d-4320-a547-0b69ac4643bd",
+            "containerId": "",
+            "name": "Post One User",
+            "url": "http://localhost:8081/user/",
+            "method": "POST",
+            "sortNum": 30000,
+            "created": "2024-02-19T11:26:44.567Z",
+            "modified": "2024-02-20T09:12:07.633Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"name\": \"tridip 3334\",\n  \"password\": \"222\",\n  \"role\": \"user\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "9468fe01-2260-41b9-ad92-d9945c68297c",
+            "colId": "49f510ff-0f6d-4320-a547-0b69ac4643bd",
+            "containerId": "",
+            "name": "Issue One Book",
+            "url": "http://localhost:8081/user/2/book/5",
+            "method": "GET",
+            "sortNum": 40000,
+            "created": "2024-02-20T04:30:39.865Z",
+            "modified": "2024-02-20T09:24:17.530Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "eacc252a-c9c2-4e2b-b117-5f1c50381be4",
+            "colId": "49f510ff-0f6d-4320-a547-0b69ac4643bd",
+            "containerId": "",
+            "name": "Get all users",
+            "url": "http://localhost:8081/user/",
+            "method": "GET",
+            "sortNum": 50000,
+            "created": "2024-02-20T04:53:52.872Z",
+            "modified": "2024-02-20T07:36:58.406Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "bf039fa8-1f29-4f65-bfd9-5f5a51228d27",
+            "colId": "49f510ff-0f6d-4320-a547-0b69ac4643bd",
+            "containerId": "",
+            "name": "Auth Login",
+            "url": "http://localhost:8081/auth/login",
+            "method": "POST",
+            "sortNum": 60000,
+            "created": "2024-02-20T08:50:47.504Z",
+            "modified": "2024-02-20T08:51:33.357Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"userId\": 1,\n  \"password\": \"123\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "40fb8437-2c43-48a8-8ee9-869fc242206d",
+            "colId": "49f510ff-0f6d-4320-a547-0b69ac4643bd",
+            "containerId": "",
+            "name": "User Login",
+            "url": "http://localhost:8081/auth/login",
+            "method": "POST",
+            "sortNum": 70000,
+            "created": "2024-02-20T09:12:40.992Z",
+            "modified": "2024-02-20T09:13:23.745Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"userId\": 2,\n  \"password\": \"222\"\n}",
+                "form": []
+            },
+            "tests": []
+        }
+    ]
+}
