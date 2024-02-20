@@ -2,6 +2,7 @@ package bookapi
 
 import (
 	"task6MuxGorm/app"
+	"task6MuxGorm/app/authservice"
 	"task6MuxGorm/app/bookservice"
 
 	"github.com/gorilla/mux"
@@ -30,10 +31,13 @@ TODO: If any other service required then may be need to expose it too.
 func Routes(router *mux.Router, app *app.App) {
 
 	bookApi := newBookApi(app)
+	authService := authservice.New(app.Config.JWT_SECRET, app.DB)
 
-	router.HandleFunc("/", bookApi.CreateBook).Methods("POST")
+	// TODO: only user can access this route
+
+	router.HandleFunc("/", authService.IsAdmin(bookApi.CreateBook)).Methods("POST") // TODO: admin only route
 	router.HandleFunc("/", bookApi.GetBooks).Methods("GET")
 	router.HandleFunc("/{id}", bookApi.GetOneBookById).Methods("GET")
-	router.HandleFunc("/{id}", bookApi.DeleteBook).Methods("DELETE")
-	router.HandleFunc("/", bookApi.UpdateBook).Methods("PUT") // body should include Id else upsert operation
+	router.HandleFunc("/{id}", authService.IsAdmin(bookApi.DeleteBook)).Methods("DELETE") // TODO: admin only route
+	router.HandleFunc("/", authService.IsAdmin(bookApi.UpdateBook)).Methods("PUT")        // body should include Id else upsert operation
 }

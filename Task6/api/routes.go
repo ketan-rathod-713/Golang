@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"task6MuxGorm/api/authapi"
 	"task6MuxGorm/api/bookapi"
 	"task6MuxGorm/api/userapi"
 	"task6MuxGorm/app"
@@ -56,6 +57,10 @@ func (api *Api) InitialiseRoutes(router *mux.Router) {
 	/* User Api */
 	userRouter := router.PathPrefix("/user").Subrouter()
 	userapi.Routes(userRouter, api.App)
+
+	/* Auth Api */
+	authRouter := router.PathPrefix("/auth").Subrouter()
+	authapi.Routes(authRouter, api.App)
 
 	// GET / : Home Handler
 	router.HandleFunc("/", homeHandler).Methods("GET")

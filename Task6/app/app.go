@@ -70,6 +70,7 @@ func loadEnv() *models.Config {
 		DB_USER_PASSWORD: os.Getenv("DB_USER_PASSWORD"),
 		DB_SCHEMA_NAME:   os.Getenv("DB_SCHEMA_NAME"),
 		PORT:             os.Getenv("PORT"),
+		JWT_SECRET:       os.Getenv("JWT_SECRET"),
 	}
 
 	return config

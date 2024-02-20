@@ -2,6 +2,8 @@ package models
 
 import (
 	"fmt"
+
+	"github.com/golang-jwt/jwt/v5"
 )
 
 // TODO: Take this Schema from env files
@@ -35,9 +37,11 @@ func (b *Book) TableName() string {
 }
 
 type User struct {
-	ID    uint64  `json:"id" gorm:"primaryKey"`
-	Name  string  `json:"name"`
-	Books []*Book `json:"books" gorm:"many2many:task6muxgorm.usersbooks;"` // referencing to book issued // lets say one user can only issue one book
+	ID       uint64  `json:"id" gorm:"primaryKey"`
+	Name     string  `json:"name"`
+	Password string  `json:"password"`
+	Role     string  `json:"role"`                                            // currently only "user" and "admin" allowed // TODO: write hooks for it
+	Books    []*Book `json:"books" gorm:"many2many:task6muxgorm.usersbooks;"` // referencing to book issued // lets say one user can only issue one book
 }
 
 func (b *User) TableName() string {
@@ -47,4 +51,16 @@ func (b *User) TableName() string {
 type BookUser struct {
 	UserId uint64
 	BookId uint64
+}
+
+// custom claims
+type Claims struct {
+	UserId uint64 `json:"userId"`
+	Role   string `json:"role"`
+	jwt.RegisteredClaims
+}
+
+type Credentials struct {
+	UserId   uint64 `json:"userId"`
+	Password string `json:"password"`
 }

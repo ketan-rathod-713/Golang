@@ -12,6 +12,7 @@ type Config struct {
 	DB_USER          string
 	DB_USER_PASSWORD string
 	DB_SCHEMA_NAME   string
+	JWT_SECRET       string
 }
 
 // Error schema to show for userA
@@ -23,3 +24,4 @@ type ApiError struct {
 func (e *ApiError) Error() string {
 	return fmt.Sprintf("Status Code:%v, Message: %v", e.Code, e.Message)
 }
+

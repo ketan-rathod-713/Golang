@@ -2,6 +2,7 @@ package userapi
 
 import (
 	"task6MuxGorm/app"
+	"task6MuxGorm/app/authservice"
 	"task6MuxGorm/app/userservice"
 
 	"github.com/gorilla/mux"
@@ -32,11 +33,16 @@ TODO: If any other service required then may be need to expose it too.
 func Routes(router *mux.Router, app *app.App) {
 
 	userApi := newUserApi(app)
+	authService := authservice.New(app.Config.JWT_SECRET, app.DB)
 
-	router.HandleFunc("/{userId}/book/{bookId}", userApi.IssueBook).Methods("GET") // body should include Id else upsert operation
-	router.HandleFunc("/", userApi.CreateUser).Methods("POST")
-	router.HandleFunc("/", userApi.GetUsers).Methods("GET")
-	router.HandleFunc("/{id}", userApi.GetOneUserById).Methods("GET")
-	router.HandleFunc("/{id}", userApi.DeleteUser).Methods("DELETE")
-	router.HandleFunc("/", userApi.UpdateUser).Methods("PUT") // body should include Id else upsert operation
+	// TODO Logic
+	// ? Admin will create user with their credentials and will provide it to user
+	// ? User then will login via their credentials and get token right done and access different services
+
+	router.HandleFunc("/{userId}/book/{bookId}", authService.IsUser(userApi.IssueBook)).Methods("GET") // TODO: user only route
+	router.HandleFunc("/", authService.IsAdmin(userApi.CreateUser)).Methods("POST") 
+	router.HandleFunc("/", authService.IsUser(userApi.GetUsers)).Methods("GET")
+	router.HandleFunc("/{id}", authService.IsUser(userApi.GetOneUserById)).Methods("GET")
+	router.HandleFunc("/{id}", authService.IsAdmin(userApi.DeleteUser)).Methods("DELETE")
+	router.HandleFunc("/", authService.IsAdmin(userApi.UpdateUser)).Methods("PUT") // body should include Id else upsert operation
 }
