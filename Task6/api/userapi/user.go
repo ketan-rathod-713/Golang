@@ -125,6 +125,7 @@ func (u *userApi) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(bk)
 }
 
+// ! Currently Any User Can Issue Book Ha ha
 // POST /book/
 func (u *userApi) IssueBook(w http.ResponseWriter, r *http.Request) {
 	bookId := mux.Vars(r)["bookId"]

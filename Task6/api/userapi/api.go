@@ -39,8 +39,8 @@ func Routes(router *mux.Router, app *app.App) {
 	// ? Admin will create user with their credentials and will provide it to user
 	// ? User then will login via their credentials and get token right done and access different services
 
-	router.HandleFunc("/{userId}/book/{bookId}", authService.IsUser(userApi.IssueBook)).Methods("GET") // TODO: user only route
-	router.HandleFunc("/", authService.IsAdmin(userApi.CreateUser)).Methods("POST") 
+	router.HandleFunc("/{userId}/book/{bookId}", authService.IsAdmin(userApi.IssueBook)).Methods("GET") // TODO: user only route
+	router.HandleFunc("/", authService.IsAdmin(userApi.CreateUser)).Methods("POST")
 	router.HandleFunc("/", authService.IsUser(userApi.GetUsers)).Methods("GET")
 	router.HandleFunc("/{id}", authService.IsUser(userApi.GetOneUserById)).Methods("GET")
 	router.HandleFunc("/{id}", authService.IsAdmin(userApi.DeleteUser)).Methods("DELETE")

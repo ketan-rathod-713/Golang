@@ -194,4 +194,3 @@ func (s *service) IssueBook(userId uint64, bookId uint64) (*models.User, error) 
 	return &user, nil
 }
 
-// TODO: Implement Error Handling at service level

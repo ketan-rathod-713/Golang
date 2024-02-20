@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+// Check consistency of database by issueing books at the same time.
 func issueBook(userId uint64) {
 
 	for i := 1; i <= 11; i++ {

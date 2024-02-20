@@ -10,25 +10,31 @@ This project implements a RESTful API for managing books. It is built using GORM
 | GET       | /         | Api Status  |
 
 ### 2. /book
-| Method    | Route     | Description       |
-| ----------| --------- | ----------------- |
-| GET       | /book/    | Get All Books     |
-| GET       | /book/{id}| Get One Book By Id|
-| POST      | /book/    | Create Book       |
-| PUT       | /book/    | Update One Book   |
-| DELETE    | /book/{id}| Delete One Book   |
+| Method    | Route     | Description       | ACCESS |
+| ----------| --------- | ----------------- | ------ |
+| GET       | /book/    | Get All Books     | anyone |
+| GET       | /book/{id}| Get One Book By Id| anyone |
+| POST      | /book/    | Create Book       | admin  |
+| PUT       | /book/    | Update One Book   | admin  |
+| DELETE    | /book/{id}| Delete One Book   | admin  |
 
 
 ### 2. /user
-| Method    | Route     | Description       |
-| ----------| --------- | ----------------- |
-| GET       | /user/    | Get All Users     |
-| GET       | /user/{id}| Get One User By Id|
-| POST      | /user/    | Create User       |
-| PUT       | /user/    | Update One User   |
-| DELETE    | /user/{id}| Delete One User   |
-| GET       | /user/{userId}/book/{bookId}| Issue One Book   |
+| Method    | Route     | Description       | ACCESS |
+| ----------| --------- | ----------------- | ------ |
+| GET       | /user/    | Get All Users     | user   |
+| GET       | /user/{id}| Get One User By Id| user   |
+| POST      | /user/    | Create User       | admin  |
+| PUT       | /user/    | Update One User   | admin  |
+| DELETE    | /user/{id}| Delete One User   | admin  |
+| GET       | /user/{userId}/book/{bookId}| Issue One Book   | admin |
 
+
+### 3. /auth
+
+| Method    | Route     | Description       | ACCESS |
+| ----------| --------- | ----------------- | ------ |
+| POST       | /auth/login    | Login by userId & Password (client will get token as cookie for further authorization purpose)    | anyone |
 
 ## Example Of Required .env Variables 
 
@@ -40,6 +46,7 @@ HOST="localhost"
 DB_USER="bacancy"
 DB_USER_PASSWORD="admin"
 DB_SCHEMA_NAME="task6muxgorm"
+JWT_SECRET="secret"
 ```
 
 ## Running The Project
