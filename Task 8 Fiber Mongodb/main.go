@@ -1,54 +1,40 @@
 package main
 
 import (
-	"context"
-	"time"
+	"fibermongoapp/api"
+	"fibermongoapp/app"
+	"fibermongoapp/configs"
+	"fmt"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
-type ApiStatus struct {
-	Status  string `json:"status"`
-	Message string `json:"message"`
-}
-
-func homeHandler(ctx *fiber.Ctx) error {
-	// default cType is application/json for this
-	return ctx.JSON(ApiStatus{Status: "OK", Message: "Api Working Fine"})
-}
-
 func main() {
-	// * Connect to mongodb
-
-	// TODO what is use case of this
-	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
-	defer cancel()
-
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://Ketan:Ketan17547@@localhost:27017"))
+	/* Initialize App (load env, connecting to database and app variables setup )*/
+	App, err := app.New()
 	if err != nil {
-		log.Error(err)
+		log.Fatal("Error Initializing App ", err)
 	}
 
-	// *mongo.Collection // *mongo.Database
-	collection := client.Database("bacancy").Collection("users")
+	/* set up api using App */
+	api := api.New(App)
+
+	// setup fiber server
 	app := fiber.New()
 
-	// A Collection can be used to query the database or insert documents:
-	res, err := collection.InsertOne(context.Background(), bson.M{"hello": "world"})
+	/*App level Middlewares */
+	app.Use(logger.New())
+
+	/* set up routes for fiber app*/
+	api.InitializeRoutes(app)
+
+	//? Listen App On Given Port
+	err = app.Listen(fmt.Sprintf(":%v", configs.ENV_PORT()))
 	if err != nil {
-		log.Error(err)
+		log.Fatal(err)
+	} else {
+		log.Info("Server Started On Port", configs.ENV_PORT())
 	}
-
-	id := res.InsertedID
-
-	log.Info("Id inserted is ", id)
-
-	app.Get("/", homeHandler)
-
-	// Listen On Port Given In .env file
-	app.Listen(":8080")
 }

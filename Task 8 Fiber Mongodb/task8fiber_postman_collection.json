@@ -1,0 +1,383 @@
+{
+	"info": {
+		"_postman_id": "225ee7f4-2008-4630-97de-a381d6722403",
+		"name": "Task 8 Fiber  Mongo User Crud",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "19886801"
+	},
+	"item": [
+		{
+			"name": "get all users",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/user",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "example 1",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/user",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"user"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Thu, 22 Feb 2024 06:07:24 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "556"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": 200,\n    \"message\": \"Retrived All Users\",\n    \"data\": {\n        \"users\": [\n            {\n                \"id\": \"65d6cd9eaac42709ad87c418\",\n                \"name\": \"ketan\",\n                \"location\": \"surat\",\n                \"title\": \"Mr.\"\n            },\n            {\n                \"id\": \"65d6cdbba0a910bd0bef6ab9\",\n                \"name\": \"ketan\",\n                \"location\": \"surat\",\n                \"title\": \"Mr.\"\n            },\n            {\n                \"id\": \"65d6d1c09fdb5853dd6086a4\",\n                \"name\": \"ketan\",\n                \"location\": \"surat\",\n                \"title\": \"Mr.\"\n            },\n            {\n                \"id\": \"000000000000000000000000\",\n                \"name\": \"ketan\",\n                \"location\": \"surat\",\n                \"title\": \"Mr.\"\n            },\n            {\n                \"id\": \"65d6d27b8375a4dd61f6c2d1\",\n                \"name\": \"ketan\",\n                \"location\": \"surat\",\n                \"title\": \"Mr.\"\n            },\n            {\n                \"id\": \"65d6d2f68375a4dd61f6c2d2\",\n                \"name\": \"ketan\",\n                \"location\": \"surat\",\n                \"title\": \"Mr.\"\n            }\n        ]\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "get one user by id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/user/65d6cd9eaac42709ad87c418",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user",
+						"65d6cd9eaac42709ad87c418"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "example",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/user/65d6cd9eaac42709ad87c418",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"user",
+								"65d6cd9eaac42709ad87c418"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Thu, 22 Feb 2024 06:12:46 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "143"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": 200,\n    \"message\": \"Retrived One User\",\n    \"data\": {\n        \"users\": {\n            \"id\": \"65d6cd9eaac42709ad87c418\",\n            \"name\": \"ketan\",\n            \"location\": \"surat\",\n            \"title\": \"Mr.\"\n        }\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "update one user",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"updated name\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/user/65d6cd9eaac42709ad87c418",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user",
+						"65d6cd9eaac42709ad87c418"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Error when updating single field",
+					"originalRequest": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"updated name\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/user/65d6cd9eaac42709ad87c418",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"user",
+								"65d6cd9eaac42709ad87c418"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Thu, 22 Feb 2024 06:13:47 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "119"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": 200,\n    \"message\": \"User Updated\",\n    \"data\": {\n        \"updated_user\": {\n            \"id\": \"65d6cd9eaac42709ad87c418\",\n            \"name\": \"updated name\"\n        }\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "delete one user",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/user/65d6d53cd8bb971c44227443",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user",
+						"65d6d53cd8bb971c44227443"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "example",
+					"originalRequest": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/user/65d6d53cd8bb971c44227443",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"user",
+								"65d6d53cd8bb971c44227443"
+							]
+						}
+					},
+					"status": "Internal Server Error",
+					"code": 500,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Thu, 22 Feb 2024 06:14:42 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "95"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": 500,\n    \"message\": \"Error Deleting User\",\n    \"data\": {\n        \"error\": \"mongo: no documents in result\"\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "create user",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"ketan\",\n    \"location\": \"ahmeadabad\",\n    \"title\": \"MR.\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/user",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Error when validation fails",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"ketan\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/user",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"user"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Thu, 22 Feb 2024 06:15:09 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "234"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": 400,\n    \"message\": \"An Error Occured\",\n    \"data\": {\n        \"errors\": \"Key: 'User.Location' Error:Field validation for 'Location' failed on the 'required' tag\\nKey: 'User.Title' Error:Field validation for 'Title' failed on the 'required' tag\"\n    }\n}"
+				},
+				{
+					"name": "example",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"ketan\",\n    \"location\": \"ahmeadabad\",\n    \"title\": \"MR.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/user",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"user"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Thu, 22 Feb 2024 06:15:53 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "142"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": 200,\n    \"message\": \"User Created\",\n    \"data\": {\n        \"user\": {\n            \"id\": \"65d6e69adbf015e9b57fe812\",\n            \"name\": \"ketan\",\n            \"location\": \"ahmeadabad\",\n            \"title\": \"MR.\"\n        }\n    }\n}"
+				}
+			]
+		}
+	]
+}
