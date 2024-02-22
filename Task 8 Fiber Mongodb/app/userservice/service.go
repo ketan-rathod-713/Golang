@@ -10,6 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+// Service interface will serve as a contract for user services
 type Service interface {
 	CreateUser(user *models.User) (*models.User, error)
 	GetUsers(queries map[string]string) ([]*models.User, error)
@@ -18,6 +19,10 @@ type Service interface {
 	DeleteUser(userId primitive.ObjectID) (*models.User, error)
 }
 
+/*
+user service requires db pointer and mongo.Collection pointer to query user collection
+TODO: here collection name is hardcoded -> improve it.
+*/
 type service struct {
 	DB             *mongo.Client
 	UserCollection *mongo.Collection

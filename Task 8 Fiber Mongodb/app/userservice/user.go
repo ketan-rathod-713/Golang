@@ -13,6 +13,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+/*
+	All user services are defined here.
+*/
+
 func (s *service) CreateUser(user *models.User) (*models.User, error) {
 
 	result, err := s.UserCollection.InsertOne(context.TODO(), user)
@@ -117,6 +121,7 @@ func (s *service) DeleteUser(userId primitive.ObjectID) (*models.User, error) {
 
 	// TODO start Transaction Here
 	// ! Need to start transaction from here
+
 	var user *models.User
 	userResult := s.UserCollection.FindOne(context.TODO(), bson.M{"_id": userId})
 	err := userResult.Decode(&user)

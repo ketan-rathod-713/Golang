@@ -7,7 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/mongo"
 )
-
+/* wrapper around all user related api's */
 type userApi struct {
 	DB       *mongo.Client
 	Service  userservice.Service
@@ -19,11 +19,10 @@ func New(db *mongo.Client) *userApi {
 }
 
 func (u *userApi) Routes(parentRouter fiber.Router) {
-	parentRouter.Get("/", u.GetUsers)  // TODO add pagination here skip and page will be given
+	parentRouter.Get("/", u.GetUsers) // TODO: add complex filters such as $gte or $lte etc.
 	parentRouter.Get("/:id", u.GetOneUserById)
 	parentRouter.Post("/", u.CreateUser)
 	parentRouter.Delete("/:id", u.DeleteUser)
 	parentRouter.Put("/:id", u.UpdateUser)
 
-	// TODO all other routes don't accept
 }

@@ -10,6 +10,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// TODO: define common custom response errors and return it.
+// TODO: should define it inside models folder
 type UserResponse struct {
 	Status  int        `json:"status"`
 	Message string     `json:"message"`

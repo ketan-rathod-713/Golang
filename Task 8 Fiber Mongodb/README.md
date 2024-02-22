@@ -25,6 +25,27 @@ Before running the API, make sure you have the following installed:
 | PUT       | /{id}| Update One User   | 
 | DELETE    | /{id}| Delete One User   | 
 
+## Models
+
+### User
+
+| Name      | Type |
+| ----------| -----|
+| Id        | primitive.ObjectId  |
+| Name      | string |
+| Location  | string   | 
+| Title     | string| 
+| Age       | int| 
+| FavoriteGames | []string | 
+| Hobby     | Hobby| 
+
+
+### Hobby
+
+| Name      | Type |
+| ----------| -----|
+| Name      | string|
+| Years     | int |
 
 ## Example Of Required .env Variables 
 

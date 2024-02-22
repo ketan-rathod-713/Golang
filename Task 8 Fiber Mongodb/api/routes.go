@@ -3,11 +3,13 @@ package api
 import (
 	"fibermongoapp/api/userapi"
 	"fibermongoapp/app"
+	"net/http"
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+/* api struct for wrapper around all api's */
 type api struct {
 	DB *mongo.Client
 }
@@ -18,6 +20,7 @@ func New(a *app.App) *api {
 	}
 }
 
+/* Initialize routes */
 func (a *api) InitializeRoutes(app *fiber.App) {
 	// intialize all routes
 	app.Get("/", homeHandler) // ! if using group here then for any route this handler will be called
@@ -32,5 +35,5 @@ func (a *api) InitializeRoutes(app *fiber.App) {
 }
 
 func homeHandler(ctx *fiber.Ctx) error {
-	return ctx.SendString("Hello World!")
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{"Status": 200, "Message": "Server Running Fine"})
 }

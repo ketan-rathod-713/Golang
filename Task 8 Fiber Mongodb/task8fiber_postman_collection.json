@@ -12,7 +12,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/user",
+					"raw": "http://localhost:8080/user?age=15",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -20,6 +20,12 @@
 					"port": "8080",
 					"path": [
 						"user"
+					],
+					"query": [
+						{
+							"key": "age",
+							"value": "15"
+						}
 					]
 				}
 			},
@@ -205,7 +211,7 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/user/65d6d53cd8bb971c44227443",
+					"raw": "http://localhost:8080/user/65d6fff1580f744c9ac13c06",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -213,7 +219,7 @@
 					"port": "8080",
 					"path": [
 						"user",
-						"65d6d53cd8bb971c44227443"
+						"65d6fff1580f744c9ac13c06"
 					]
 				}
 			},
@@ -265,7 +271,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"name\": \"ketan\",\n    \"location\": \"ahmeadabad\",\n    \"title\": \"MR.\"\n}",
+					"raw": "{\n    \"name\": \"ketan\",\n    \"location\": \"ahmeadabad\",\n    \"title\": \"MR.\",\n    \"age\": 18,\n    \"favoriteGames\": [\"casual-play\"],\n    \"hobby\": {\n        \"name\": \"cycling\",\n        \"years\": 2\n    }\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -338,7 +344,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"ketan\",\n    \"location\": \"ahmeadabad\",\n    \"title\": \"MR.\"\n}",
+							"raw": "{\n    \"name\": \"ketan\",\n    \"location\": \"ahmeadabad\",\n    \"title\": \"MR.\",\n    \"age\": 18,\n    \"favoriteGames\": [\"casual-play\"],\n    \"hobby\": {\n        \"name\": \"cycling\",\n        \"years\": 2\n    }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -363,7 +369,7 @@
 					"header": [
 						{
 							"key": "Date",
-							"value": "Thu, 22 Feb 2024 06:15:53 GMT"
+							"value": "Thu, 22 Feb 2024 12:07:36 GMT"
 						},
 						{
 							"key": "Content-Type",
@@ -371,11 +377,11 @@
 						},
 						{
 							"key": "Content-Length",
-							"value": "142"
+							"value": "220"
 						}
 					],
 					"cookie": [],
-					"body": "{\n    \"status\": 200,\n    \"message\": \"User Created\",\n    \"data\": {\n        \"user\": {\n            \"id\": \"65d6e69adbf015e9b57fe812\",\n            \"name\": \"ketan\",\n            \"location\": \"ahmeadabad\",\n            \"title\": \"MR.\"\n        }\n    }\n}"
+					"body": "{\n    \"status\": 200,\n    \"message\": \"User Created\",\n    \"data\": {\n        \"user\": {\n            \"id\": \"65d73908295fd570ce66e722\",\n            \"name\": \"ketan\",\n            \"location\": \"ahmeadabad\",\n            \"title\": \"MR.\",\n            \"age\": 18,\n            \"favoriteGames\": [\n                \"casual-play\"\n            ],\n            \"hobby\": {\n                \"name\": \"cycling\",\n                \"years\": 2\n            }\n        }\n    }\n}"
 				}
 			]
 		}
