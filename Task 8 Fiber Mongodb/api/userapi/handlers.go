@@ -69,6 +69,13 @@ func (u *userApi) GetUsers(ctx *fiber.Ctx) error {
 	return ctx.Status(http.StatusOK).JSON(UserResponse{Status: http.StatusOK, Message: "Retrived All Users", Data: &fiber.Map{"users": users}})
 }
 
+func (u *userApi) AnalyzeUsers(ctx *fiber.Ctx) error {
+
+	u.Service.AnalyzeUsers()
+
+	return nil
+}
+
 func (u *userApi) GetOneUserById(ctx *fiber.Ctx) error {
 
 	id := ctx.Params("id")

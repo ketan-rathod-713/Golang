@@ -16,6 +16,7 @@ type Service interface {
 	GetOneUserById(userId primitive.ObjectID) (*models.User, error)
 	UpdateUser(user *models.User) (*models.User, error)
 	DeleteUser(userId primitive.ObjectID) (*models.User, error)
+	AnalyzeUsers() (error)
 }
 
 type service struct {

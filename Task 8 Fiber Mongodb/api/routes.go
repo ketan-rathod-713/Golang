@@ -27,10 +27,12 @@ func (a *api) InitializeRoutes(app *fiber.App) {
 	userApi := userapi.New(a.DB)
 	userApi.Routes(userRouter)
 
-	/* other routes */
-
 }
 
 func homeHandler(ctx *fiber.Ctx) error {
+	return ctx.SendString("Hello World!")
+}
+
+func mongoHandler(ctx *fiber.Ctx) error {
 	return ctx.SendString("Hello World!")
 }

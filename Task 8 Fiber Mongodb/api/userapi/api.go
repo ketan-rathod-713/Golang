@@ -19,11 +19,11 @@ func New(db *mongo.Client) *userApi {
 }
 
 func (u *userApi) Routes(parentRouter fiber.Router) {
-	parentRouter.Get("/", u.GetUsers)  // TODO add pagination here skip and page will be given
+	parentRouter.Get("/analyse", u.AnalyzeUsers)
+	parentRouter.Get("/", u.GetUsers) // TODO add pagination here skip and page will be given
 	parentRouter.Get("/:id", u.GetOneUserById)
 	parentRouter.Post("/", u.CreateUser)
 	parentRouter.Delete("/:id", u.DeleteUser)
 	parentRouter.Put("/:id", u.UpdateUser)
-
 	// TODO all other routes don't accept
 }

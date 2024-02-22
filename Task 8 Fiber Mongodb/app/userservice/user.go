@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fibermongoapp/models"
+	"fmt"
 	"time"
 
 	"github.com/gofiber/fiber/v2/log"
@@ -107,4 +108,66 @@ func (s *service) DeleteUser(userId primitive.ObjectID) (*models.User, error) {
 	}
 
 	return user, nil
+}
+
+func (s *service) AnalyzeUsers() error {
+
+	filter := bson.M{
+		"$and": []bson.M{ // TODO use array here
+			bson.M{
+				"age": bson.M{
+					"$gte": 9,
+					"$lte": 25,
+				},
+			},
+			bson.M{
+				"favorite_sport": "cricket",
+			},
+		},
+	}
+
+	//?  How it is done in mogodb ??
+
+	cursor, _ := s.UserCollection.Find(context.TODO(), filter)
+
+	var users []*models.User
+	cursor.All(context.TODO(), &users)
+	for _, user := range users {
+		fmt.Println(user)
+	}
+
+	type Result struct {
+		Count int    `bson:"count"`
+		Sport string `bson:"_id"`
+	}
+
+	pipeline := []bson.D{
+		bson.D{
+			{"$group", bson.D{
+				{"_id", "$favorite_sport"},
+				{"count", bson.D{{"$sum", 1}}},
+			}},
+		},
+	}
+
+	cursor, err := s.UserCollection.Aggregate(context.TODO(), pipeline)
+	if err != nil {
+		// Handle error
+		log.Fatal(err)
+	}
+	defer cursor.Close(context.TODO())
+
+	var results []Result
+	if err := cursor.All(context.TODO(), &results); err != nil {
+		// Handle error
+		log.Fatal(err)
+	}
+
+	for _, res := range results {
+		fmt.Println(res)
+	}
+
+	// 
+
+	return nil
 }
