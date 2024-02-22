@@ -44,5 +44,4 @@ HOST="localhost"
 
 ## Example Api Requests
 
-
-
+You can import example api requests in postman using `task8fiber_postman_collection.json` file in current directory.
