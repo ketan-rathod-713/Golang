@@ -4,7 +4,8 @@ import (
 	"context"
 	"errors"
 	"fibermongoapp/models"
-	"time"
+	"fmt"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2/log"
 	"go.mongodb.org/mongo-driver/bson"
@@ -30,17 +31,44 @@ func (s *service) CreateUser(user *models.User) (*models.User, error) {
 	return user, nil
 }
 
-func (s *service) GetUsers() ([]*models.User, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
+func (s *service) GetUsers(queries map[string]string) ([]*models.User, error) {
+	/* Pagination Logic */
+	var skip = 5 // by default only show 5 pages at once
+	var page = 1
 
-	cursor, err := s.UserCollection.Find(ctx, bson.D{})
+	// check if queries contains skip and page variables
+	if val, ok := queries["skip"]; ok {
+		skip, _ = strconv.Atoi(val)
+	}
+	if val, ok := queries["page"]; ok {
+		page, _ = strconv.Atoi(val)
+	}
+
+	// build bson.M or D from map[string]string
+	var filter = bson.D{}
+	for key, value := range queries {
+		if key == "page" || key == "skip" {
+			// do nothing
+		} else if key == "favoriteGames" {
+			filter = append(filter, bson.E{Key: key, Value: value})
+		} else if key == "age" || key == "hobby.years" {
+			intVal, _ := strconv.Atoi(value)
+			filter = append(filter, bson.E{Key: key, Value: intVal})
+		} else {
+			filter = append(filter, bson.E{Key: key, Value: value})
+		}
+	}
+
+	// Print the bson.D
+	fmt.Println(filter)
+
+	cursor, err := s.UserCollection.Find(context.TODO(), filter, options.Find().SetSkip(int64(skip*(page-1))).SetLimit(int64(skip)))
 	if err != nil {
 		return nil, err
 	}
 
 	var users []*models.User
-	err = cursor.All(ctx, &users)
+	err = cursor.All(context.TODO(), &users)
 	if err != nil {
 		return nil, err
 	}

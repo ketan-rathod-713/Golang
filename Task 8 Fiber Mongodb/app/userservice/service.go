@@ -12,7 +12,7 @@ import (
 
 type Service interface {
 	CreateUser(user *models.User) (*models.User, error)
-	GetUsers() ([]*models.User, error)
+	GetUsers(queries map[string]string) ([]*models.User, error)
 	GetOneUserById(userId primitive.ObjectID) (*models.User, error)
 	UpdateUser(user *models.User) (*models.User, error)
 	DeleteUser(userId primitive.ObjectID) (*models.User, error)

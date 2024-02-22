@@ -60,7 +60,10 @@ func (u *userApi) CreateUser(ctx *fiber.Ctx) error {
 
 func (u *userApi) GetUsers(ctx *fiber.Ctx) error {
 
-	users, err := u.Service.GetUsers()
+	// add query parameters here
+	queries := ctx.Queries()
+
+	users, err := u.Service.GetUsers(queries)
 
 	if err != nil {
 		ctx.Status(http.StatusInternalServerError).JSON(UserResponse{Status: http.StatusInternalServerError, Message: "Internal Server Error", Data: nil})
