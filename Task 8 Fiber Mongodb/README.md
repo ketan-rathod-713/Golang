@@ -66,3 +66,49 @@ HOST="localhost"
 ## Example Api Requests
 
 You can import example api requests in postman using `task8fiber_postman_collection.json` file in current directory.
+
+## Notes
+
+### Mongodb
+
+#### Array Manipulation Techniques
+
+- To project or return all the elements from array use $ ( positional operator )
+- To update all elements in an array, see the all positional operator $[] instead.
+- To update all elements that match an array filter condition or conditions, see the filtered positional operator instead $[<identifier>]
+
+```
+db.students.updateOne(
+   { _id: 1, grades: 80 },
+   { $set: { "grades.$" : 82 } }
+)
+```
+Above one will update first grade element whose value is 80.
+
+We can also update embedded documents using "array.$.field"
+
+##### Update Embedded Documents Using Multiple Field Matches
+
+```
+ $elemMatch: { grade: { $lte: 90 }, mean: { $gt: 80 } }
+ ```
+ Hence for multiple field matches of array we need to use $elemMatch Operator.
+
+ ##### The all positional operator $[]
+
+ The update operator will modify all array elements.
+ 
+ `{ <update operator>: { "<array>.$[]" : value } }`
+ Example `  { $inc: { "grades.$[].std" : -2 } },`
+
+- It can be used with nested arrays. 
+
+- update all the array elements which are not equal to 100
+```
+db.results.updateMany(
+   { "grades" : { $ne: 100 } },
+   { $inc: { "grades.$[]": 10 } },
+)
+```
+
+#####

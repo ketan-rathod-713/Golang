@@ -12,18 +12,13 @@ import (
 
 // TODO: define common custom response errors and return it.
 // TODO: should define it inside models folder
-type UserResponse struct {
-	Status  int        `json:"status"`
-	Message string     `json:"message"`
-	Data    *fiber.Map `json:"data"`
-}
 
 func (u *userApi) CreateUser(ctx *fiber.Ctx) error {
 	// get user json data
 	var user *models.User
 	err := ctx.BodyParser(&user)
 	if err != nil { // TODO how to handler errors of handlers in fiber
-		return ctx.Status(http.StatusBadRequest).JSON(UserResponse{Status: http.StatusBadRequest, Message: "Error Parsing Data", Data: nil})
+		return ctx.Status(http.StatusBadRequest).JSON(models.Response{Status: http.StatusBadRequest, Message: "Error Parsing Data", Data: nil})
 	}
 
 	//TODO use the validator library to validate required fields
@@ -45,19 +40,19 @@ func (u *userApi) CreateUser(ctx *fiber.Ctx) error {
 			log.Info(err.Tag())
 		}
 
-		return ctx.Status(http.StatusBadRequest).JSON(UserResponse{Status: http.StatusBadRequest, Message: "An Error Occured", Data: &fiber.Map{"errors": err.Error()}})
+		return ctx.Status(http.StatusBadRequest).JSON(models.Response{Status: http.StatusBadRequest, Message: "An Error Occured", Data: &fiber.Map{"errors": err.Error()}})
 	}
 
 	// pass it to service
 	user, err = u.Service.CreateUser(user)
 
 	if err != nil {
-		ctx.Status(http.StatusInternalServerError).JSON(UserResponse{Status: http.StatusInternalServerError, Message: "Internal Server Error", Data: &fiber.Map{"error": err.Error()}})
+		ctx.Status(http.StatusInternalServerError).JSON(models.Response{Status: http.StatusInternalServerError, Message: "Internal Server Error", Data: &fiber.Map{"error": err.Error()}})
 		return err
 	}
 	// generate response and send
 
-	return ctx.Status(http.StatusOK).JSON(UserResponse{Status: http.StatusOK, Message: "User Created", Data: &fiber.Map{"user": user}})
+	return ctx.Status(http.StatusOK).JSON(models.Response{Status: http.StatusOK, Message: "User Created", Data: &fiber.Map{"user": user}})
 }
 
 func (u *userApi) GetUsers(ctx *fiber.Ctx) error {
@@ -68,10 +63,10 @@ func (u *userApi) GetUsers(ctx *fiber.Ctx) error {
 	users, err := u.Service.GetUsers(queries)
 
 	if err != nil {
-		ctx.Status(http.StatusInternalServerError).JSON(UserResponse{Status: http.StatusInternalServerError, Message: "Internal Server Error", Data: nil})
+		ctx.Status(http.StatusInternalServerError).JSON(models.Response{Status: http.StatusInternalServerError, Message: "Internal Server Error", Data: nil})
 	}
 
-	return ctx.Status(http.StatusOK).JSON(UserResponse{Status: http.StatusOK, Message: "Retrived All Users", Data: &fiber.Map{"users": users}})
+	return ctx.Status(http.StatusOK).JSON(models.Response{Status: http.StatusOK, Message: "Retrived All Users", Data: &fiber.Map{"users": users}})
 }
 
 func (u *userApi) GetOneUserById(ctx *fiber.Ctx) error {
@@ -80,16 +75,16 @@ func (u *userApi) GetOneUserById(ctx *fiber.Ctx) error {
 
 	userObjectId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		return ctx.Status(http.StatusBadRequest).JSON(UserResponse{Status: http.StatusBadRequest, Message: "Error Getting id Param", Data: &fiber.Map{"error": err.Error()}})
+		return ctx.Status(http.StatusBadRequest).JSON(models.Response{Status: http.StatusBadRequest, Message: "Error Getting id Param", Data: &fiber.Map{"error": err.Error()}})
 	}
 
 	user, err := u.Service.GetOneUserById(userObjectId)
 
 	if err != nil {
-		return ctx.Status(http.StatusInternalServerError).JSON(UserResponse{Status: http.StatusInternalServerError, Message: "No documents found", Data: nil})
+		return ctx.Status(http.StatusInternalServerError).JSON(models.Response{Status: http.StatusInternalServerError, Message: "No documents found", Data: nil})
 	}
 
-	return ctx.Status(http.StatusOK).JSON(UserResponse{Status: http.StatusOK, Message: "Retrived One User", Data: &fiber.Map{"users": user}})
+	return ctx.Status(http.StatusOK).JSON(models.Response{Status: http.StatusOK, Message: "Retrived One User", Data: &fiber.Map{"users": user}})
 }
 
 func (u *userApi) UpdateUser(ctx *fiber.Ctx) error {
@@ -97,7 +92,7 @@ func (u *userApi) UpdateUser(ctx *fiber.Ctx) error {
 	var user *models.User
 	err := ctx.BodyParser(&user)
 	if err != nil { // TODO how to handler errors of handlers in fiber
-		return ctx.Status(http.StatusBadRequest).JSON(UserResponse{Status: http.StatusBadRequest, Message: "Error Parsing Data", Data: &fiber.Map{"error": err.Error()}})
+		return ctx.Status(http.StatusBadRequest).JSON(models.Response{Status: http.StatusBadRequest, Message: "Error Parsing Data", Data: &fiber.Map{"error": err.Error()}})
 	}
 
 	// get Id from parameters
@@ -105,7 +100,7 @@ func (u *userApi) UpdateUser(ctx *fiber.Ctx) error {
 
 	user.ID, err = primitive.ObjectIDFromHex(id)
 	if err != nil {
-		return ctx.Status(http.StatusBadRequest).JSON(UserResponse{Status: http.StatusBadRequest, Message: "Error Getting id Param", Data: &fiber.Map{"error": err.Error()}})
+		return ctx.Status(http.StatusBadRequest).JSON(models.Response{Status: http.StatusBadRequest, Message: "Error Getting id Param", Data: &fiber.Map{"error": err.Error()}})
 	}
 
 	// TODO Validate User Data
@@ -114,11 +109,11 @@ func (u *userApi) UpdateUser(ctx *fiber.Ctx) error {
 	// call update user service
 	user, err = u.Service.UpdateUser(user)
 	if err != nil {
-		return ctx.Status(http.StatusOK).JSON(UserResponse{Status: http.StatusOK, Message: "Error Updating User", Data: &fiber.Map{"error": err.Error()}})
+		return ctx.Status(http.StatusOK).JSON(models.Response{Status: http.StatusOK, Message: "Error Updating User", Data: &fiber.Map{"error": err.Error()}})
 	}
 	// give response
 
-	return ctx.Status(http.StatusOK).JSON(UserResponse{Status: http.StatusOK, Message: "User Updated", Data: &fiber.Map{"updated_user": user}})
+	return ctx.Status(http.StatusOK).JSON(models.Response{Status: http.StatusOK, Message: "User Updated", Data: &fiber.Map{"updated_user": user}})
 }
 
 func (u *userApi) DeleteUser(ctx *fiber.Ctx) error {
@@ -127,14 +122,14 @@ func (u *userApi) DeleteUser(ctx *fiber.Ctx) error {
 	// call service
 	objectId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		return ctx.Status(http.StatusBadRequest).JSON(UserResponse{Status: http.StatusBadRequest, Message: "Error Getting id Param", Data: &fiber.Map{"error": err.Error()}})
+		return ctx.Status(http.StatusBadRequest).JSON(models.Response{Status: http.StatusBadRequest, Message: "Error Getting id Param", Data: &fiber.Map{"error": err.Error()}})
 	}
 
 	user, err := u.Service.DeleteUser(objectId)
 	if err != nil {
-		return ctx.Status(http.StatusInternalServerError).JSON(UserResponse{Status: http.StatusInternalServerError, Message: "Error Deleting User", Data: &fiber.Map{"error": err.Error()}})
+		return ctx.Status(http.StatusInternalServerError).JSON(models.Response{Status: http.StatusInternalServerError, Message: "Error Deleting User", Data: &fiber.Map{"error": err.Error()}})
 	}
 
 	// return response
-	return ctx.Status(http.StatusOK).JSON(UserResponse{Status: http.StatusOK, Message: "User Deleted", Data: &fiber.Map{"deleted_user": user}})
+	return ctx.Status(http.StatusOK).JSON(models.Response{Status: http.StatusOK, Message: "User Deleted", Data: &fiber.Map{"deleted_user": user}})
 }

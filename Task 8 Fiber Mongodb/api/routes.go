@@ -1,22 +1,22 @@
 package api
 
 import (
+	"fibermongoapp/api/adminapi"
 	"fibermongoapp/api/userapi"
 	"fibermongoapp/app"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 /* api struct for wrapper around all api's */
 type api struct {
-	DB *mongo.Client
+	App *app.App
 }
 
 func New(a *app.App) *api {
 	return &api{
-		DB: a.DB,
+		App: a,
 	}
 }
 
@@ -27,10 +27,13 @@ func (a *api) InitializeRoutes(app *fiber.App) {
 
 	/* user routes */
 	userRouter := app.Group("/user")
-	userApi := userapi.New(a.DB)
+	userApi := userapi.New(a.App)
 	userApi.Routes(userRouter)
 
 	/* other routes */
+	adminRouter := app.Group("/admin")
+	adminApi := adminapi.New(a.App)
+	adminApi.Routes(adminRouter)
 
 }
 

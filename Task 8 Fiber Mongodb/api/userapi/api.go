@@ -1,12 +1,14 @@
 package userapi
 
 import (
+	"fibermongoapp/app"
 	"fibermongoapp/app/userservice"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/mongo"
 )
+
 /* wrapper around all user related api's */
 type userApi struct {
 	DB       *mongo.Client
@@ -14,8 +16,8 @@ type userApi struct {
 	Validate *validator.Validate
 }
 
-func New(db *mongo.Client) *userApi {
-	return &userApi{DB: db, Service: userservice.New(db), Validate: validator.New(validator.WithRequiredStructEnabled())}
+func New(app *app.App) *userApi {
+	return &userApi{DB: app.DB, Service: userservice.New(app.DB), Validate: validator.New(validator.WithRequiredStructEnabled())}
 }
 
 func (u *userApi) Routes(parentRouter fiber.Router) {
