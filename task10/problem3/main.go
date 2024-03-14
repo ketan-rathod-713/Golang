@@ -1,3 +1,5 @@
+// ALTERNATE 1
+
 // package main
 
 // import "fmt"
@@ -116,16 +118,75 @@
 // FINAL OUTPUT
 package main
 
-func fizz(){
+import (
+	"fmt"
+	"time"
+)
 
+var (
+	m3   chan int  = make(chan int)
+	m5   chan int  = make(chan int, 0)
+	m15  chan int  = make(chan int)
+	next chan bool = make(chan bool)
+)
+
+func fizz() {
+	for {
+		// wait for multiple of 3
+		data := <-m3
+		fmt.Println("Fizz for ", data)
+
+		// Now next goroutine can start processing
+		next <- true
+	}
 }
 
-func buzz(){
+func buzz() {
+	for {
+		// wait for multiple of 5
+		data := <-m5
+		fmt.Println("Buzz for ", data)
 
+		next <- true
+	}
 }
 
-func fizzbuzz(){
+func fizzbuzz() {
+	for {
+		// wait for multiple of 15
+		data := <-m15
+		fmt.Println("FizzBuzz for ", data)
 
+		next <- true
+	}
 }
 
-// agar tino mese kuch na aaye then after some timeout print normal number
+func main() {
+	start := time.Now()
+	go fizz()
+	go buzz()
+	go fizzbuzz()
+
+	for i := 1; i <= 30; i++ {
+		if i%15 == 0 {
+			m15 <- i
+			<-next // Don't Procceed Further Until FizzBuzz goruotine Performs it's execution.
+
+		} else if i%5 == 0 {
+			m5 <- i
+			<-next
+
+		} else if i%3 == 0 {
+			m3 <- i
+			<-next
+
+		} else {
+			fmt.Println(i)
+		}
+
+		// don't procceed to next execution before permiss
+	}
+
+	elapsed := time.Now().Sub(start)
+	fmt.Println("Time Taken", elapsed)
+}
