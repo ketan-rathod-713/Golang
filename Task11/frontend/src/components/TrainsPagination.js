@@ -40,6 +40,7 @@ const TrainsPagination = () => {
     }
 
     const handleLimitChange = (newLimit)=>{
+        setPage(1)
         setLimit(newLimit)
     }
 
@@ -92,7 +93,7 @@ const TrainsPagination = () => {
         <div className='records-per-page'>
             <label>Records Per Page</label>
             <div>
-                <select id='select' onChange={(e)=>handleLimitChange(e.target.value)}>
+                <select id='select' value={limit} onChange={(e)=>handleLimitChange(e.target.value)}>
                 <option value={10}>10</option>
                 <option value={50}>50</option>
                 <option value={100}>100</option>
