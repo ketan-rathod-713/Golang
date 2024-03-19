@@ -105,6 +105,7 @@ func main() {
 		log.Println("Data Uploaded Successfully")
 
 	} else {
+		// start main server
 		app.StartServer()
 	}
 }

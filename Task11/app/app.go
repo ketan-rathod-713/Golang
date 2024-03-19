@@ -20,6 +20,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+// connect to database with timeout of 20 sec.
 func InitDB(env *models.Env) (*mongo.Client, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
@@ -48,6 +49,7 @@ func GetCollectionTrain(db *mongo.Database) *mongo.Collection {
 	return db.Collection("trains")
 }
 
+// load env variables
 func LoadEnv() *models.Env {
 	err := godotenv.Load()
 	if err != nil {
@@ -62,12 +64,16 @@ func LoadEnv() *models.Env {
 	return &env
 }
 
+// don't use special characters in regex and hence remove it before.
 func escapeRegex(text string) string {
 	return regexp.QuoteMeta(text)
 }
 
 func StartServer() {
+	// load env variables
 	env := LoadEnv()
+
+	// intialise database
 	client, err := InitDB(env)
 	if err != nil {
 		log.Fatal(err)
@@ -76,11 +82,17 @@ func StartServer() {
 	db := GetDB(client)
 	trainsColl := GetCollectionTrain(db)
 
+	// API STATUS
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Hello World!")
 	})
 
-	// get paginated trains
+	// GET /trains 
+	// Example URL : /trains?page=1&limit=10&search=ahmedabad&sort="name"&order=1
+	// Get Paginated trains data with sorting of one field.
+	// If query params not given then default values will be as follows :
+	// page : 1, limit : 10, sort : "number", order : 1, search : ""
+	// TODO not using controllers for now. 
 	http.HandleFunc("/train", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 
@@ -180,6 +192,7 @@ func StartServer() {
 				trains = append(trains, train)
 			}
 
+			// ? Below way is also valid but let me try above one.
 			// err = cursor.All(context.Background(), &trains)
 			// if err != nil {
 			// 	json.NewEncoder(w).Encode(models.ErrorResponse{Status: 404, Message: "Error gettting data from cursor"})
@@ -210,6 +223,10 @@ func StartServer() {
 			)
 		}
 	})
+
+
+
+	// Start Server On Given Port
 	log.Println("Server started on port", env.PORT)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", env.PORT), nil))
 }
