@@ -20,11 +20,11 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func InitDB() (*mongo.Client, error) {
+func InitDB(env *models.Env) (*mongo.Client, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(env.DB_URL))
 
 	if err != nil {
 		return nil, err
@@ -55,7 +55,8 @@ func LoadEnv() *models.Env {
 	}
 
 	env := models.Env{
-		PORT: os.Getenv("PORT"),
+		PORT:   os.Getenv("PORT"),
+		DB_URL: os.Getenv("DB_URL"),
 	}
 
 	return &env
@@ -67,7 +68,7 @@ func escapeRegex(text string) string {
 
 func StartServer() {
 	env := LoadEnv()
-	client, err := InitDB()
+	client, err := InitDB(env)
 	if err != nil {
 		log.Fatal(err)
 	}

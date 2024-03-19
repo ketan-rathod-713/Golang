@@ -20,4 +20,24 @@
 
 ```
 PORT=8080
+DB_URL="mongodb://localhost:27017"
+```
+
+## Running Project
+
+### Start Server
+
+```
+cd Task11
+go run main.go --readcsv --path All_Indian_Trains.csv // Do it only once
+go run main.go  // for starting server
+```
+
+### Start React Server
+
+```
+cd Task11
+cd frontend
+npm install
+npm start
 ```

@@ -28,8 +28,9 @@ func main() {
 		// Do connection with mongodb
 		// read line by line csv
 		// insert to mongodb
+		env := app.LoadEnv()
 
-		client, err := app.InitDB()
+		client, err := app.InitDB(env)
 		if err != nil {
 			log.Fatal(err)
 		}

@@ -3,7 +3,8 @@ package models
 import "go.mongodb.org/mongo-driver/bson/primitive"
 
 type Env struct {
-	PORT string
+	PORT   string
+	DB_URL string
 }
 
 type Train struct {
