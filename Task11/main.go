@@ -10,11 +10,33 @@ import (
 	"mongodbpagination/app"
 	"os"
 	"strconv"
+	"sync"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
+// do this operation concurrently
+func insertRecordToMongodb(session *mongo.Session, trains *mongo.Collection, trainNumber int, record []string, wg *sync.WaitGroup) error {
+	defer wg.Done()
+	_, err := trains.InsertOne(context.Background(), bson.M{
+		"number":      trainNumber,
+		"name":        record[2],
+		"source":      record[3],
+		"destination": record[4],
+	})
+
+	log.Println(record)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func main() {
+	startTime := time.Now()
 	// Use this boolean flag to decide wheather to read csv and upload to database or start server and listen.
 	var flagCsvRead bool
 	var flagPath string // from which path to read
@@ -59,6 +81,7 @@ func main() {
 		}
 
 		session.StartTransaction()
+		var wg sync.WaitGroup
 
 		for {
 			record, err := reader.Read()
@@ -79,7 +102,7 @@ func main() {
 				continue
 			}
 
-			log.Println(record)
+			// log.Println(record)
 
 			trainNumber, err := strconv.Atoi(record[1])
 			if err != nil {
@@ -89,21 +112,21 @@ func main() {
 				session.AbortTransaction(context.Background())
 				session.EndSession(context.Background())
 			}
-			// insert data to mongodb trains collection
-			trains.InsertOne(context.Background(), bson.M{
-				"number":      trainNumber,
-				"name":        record[2],
-				"source":      record[3],
-				"destination": record[4],
-			})
+			// ? insert data to mongodb trains collection
+			wg.Add(1)
+			go insertRecordToMongodb(&session, trains, trainNumber, record, &wg)
 		}
 
+		wg.Wait() // wait for all gorotines before committing
 		session.CommitTransaction(context.Background())
 		session.EndSession(context.Background())
 		// todo End transaction here
 
 		log.Println("Data Uploaded Successfully")
 
+		elapsedTime := time.Now().Sub(startTime)
+
+		log.Println("Total Time Taken", elapsedTime)
 	} else {
 		// start main server
 		app.StartServer()
