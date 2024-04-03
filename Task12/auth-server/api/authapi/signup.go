@@ -20,16 +20,6 @@ var validate *validator.Validate = validator.New(validator.WithRequiredStructEna
 // Handle signup will get user info in json formate and it will store it inside database
 // encrypt password using hashing // Todo
 
-type errorResponse struct {
-	Errors []Error `json:"errors"`
-	Type   string  `json:"type"`
-}
-
-type Error struct { // can be validation error, internal error etc.
-	Field string `json:"field"`
-	Error string `json:"error"`
-}
-
 func (a *Api) HandleSignUp(w http.ResponseWriter, r *http.Request) {
 	var req models.SignupRequest
 	json.NewDecoder(r.Body).Decode(&req)
@@ -47,16 +37,13 @@ func (a *Api) HandleSignUp(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		var errors []Error
+		var errors []models.Error
 		for _, err := range err.(validator.ValidationErrors) {
-			fmt.Println(err.Error())
-			fmt.Println(err.Field())
-
-			newError := Error{Field: err.Field(), Error: err.Error()}
+			newError := models.Error{Field: err.Field(), Error: err.Error()}
 			errors = append(errors, newError)
 		}
 
-		response := errorResponse{Errors: errors, Type: "validation"}
+		response := models.ErrorResponse{Errors: errors, Type: "validation"}
 		json.NewEncoder(w).Encode(response)
 		return
 	} else {
@@ -69,14 +56,14 @@ func (a *Api) HandleSignUp(w http.ResponseWriter, r *http.Request) {
 		if err != nil && !errors.Is(err, mongo.ErrNoDocuments) {
 			fmt.Println(err)
 			// return err response
-			response := errorResponse{Errors: []Error{Error{Field: "signup", Error: err.Error()}}, Type: "internal"}
+			response := models.ErrorResponse{Errors: []models.Error{models.Error{Field: "signup", Error: err.Error()}}, Type: "internal"}
 			json.NewEncoder(w).Encode(response)
 			return
 		}
 
 		if userGot.Email == req.Email {
 			fmt.Println("email id already registered")
-			response := errorResponse{Errors: []Error{Error{Field: "email", Error: "Email Id Already Registered"}}, Type: "internal"}
+			response := models.ErrorResponse{Errors: []models.Error{models.Error{Field: "email", Error: "Email Id Already Registered"}}, Type: "internal"}
 			json.NewEncoder(w).Encode(response)
 			return
 		}
@@ -87,7 +74,7 @@ func (a *Api) HandleSignUp(w http.ResponseWriter, r *http.Request) {
 
 		if err != nil {
 			fmt.Println("Error inserting data to mongodb")
-			response := errorResponse{Errors: []Error{Error{Field: "signup", Error: "Error Inserting data in mongodb database"}}, Type: "internal"}
+			response := models.ErrorResponse{Errors: []models.Error{models.Error{Field: "signup", Error: "Error Inserting data in mongodb database"}}, Type: "internal"}
 			json.NewEncoder(w).Encode(response)
 			return
 		}

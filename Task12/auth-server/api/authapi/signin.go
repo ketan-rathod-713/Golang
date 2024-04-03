@@ -18,13 +18,9 @@ import (
 // then generate jwt token for user and send it as a json.
 
 // for signin only get emailId and Password
-type signInRequest struct {
-	Email    string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"required"`
-}
 
 func (a *Api) HandleSignin(w http.ResponseWriter, r *http.Request) {
-	var signInRequest signInRequest
+	var signInRequest models.SignInRequest
 	json.NewDecoder(r.Body).Decode(&signInRequest)
 
 	// set response type to json
@@ -42,20 +38,16 @@ func (a *Api) HandleSignin(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		var errors []Error
+		var errors []models.Error
 		for _, err := range err.(validator.ValidationErrors) {
-			fmt.Println(err.Error())
-			fmt.Println(err.Field())
-
-			newError := Error{Field: err.Field(), Error: err.Error()}
+			newError := models.Error{Field: err.Field(), Error: err.Error()}
 			errors = append(errors, newError)
 		}
 
-		response := errorResponse{Errors: errors, Type: "validation"}
+		response := models.ErrorResponse{Errors: errors, Type: "validation"}
 		json.NewEncoder(w).Encode(response)
 		return
 	} else {
-
 		// check for one document with given email Id and Password
 		var user models.User
 		result := a.DB.Collection("users").FindOne(context.TODO(), bson.M{"email": signInRequest.Email})
@@ -68,13 +60,13 @@ func (a *Api) HandleSignin(w http.ResponseWriter, r *http.Request) {
 
 			// if no documents found means user does not exist
 			if errors.Is(err, mongo.ErrNoDocuments) {
-				response := errorResponse{Errors: []Error{Error{Field: "signin", Error: "User does not exist for given email Id"}}, Type: "internal"}
+				response := models.ErrorResponse{Errors: []models.Error{models.Error{Field: "signin", Error: "User does not exist for given email Id"}}, Type: "internal"}
 				json.NewEncoder(w).Encode(response)
 				return
 			}
 
 			// return err response
-			response := errorResponse{Errors: []Error{Error{Field: "signin", Error: err.Error()}}, Type: "internal"}
+			response := models.ErrorResponse{Errors: []models.Error{models.Error{Field: "signin", Error: err.Error()}}, Type: "internal"}
 			json.NewEncoder(w).Encode(response)
 			return
 		}
@@ -82,7 +74,7 @@ func (a *Api) HandleSignin(w http.ResponseWriter, r *http.Request) {
 		// check if password matching or not
 		if user.Password != signInRequest.Password {
 			fmt.Println("Password Not Matching")
-			response := errorResponse{Errors: []Error{Error{Field: "signin", Error: "Password Not Matching"}}, Type: "internal"}
+			response := models.ErrorResponse{Errors: []models.Error{models.Error{Field: "signin", Error: "Password Not Matching"}}, Type: "internal"}
 			json.NewEncoder(w).Encode(response)
 			return
 		}
@@ -92,7 +84,7 @@ func (a *Api) HandleSignin(w http.ResponseWriter, r *http.Request) {
 		JwtToken, err := a.JwtService.GenerateJwtToken(&userClaims, a.Config)
 		if err != nil {
 			fmt.Println(err)
-			response := errorResponse{Errors: []Error{Error{Field: "signin", Error: err.Error()}}, Type: "internal"}
+			response := models.ErrorResponse{Errors: []models.Error{models.Error{Field: "signin", Error: err.Error()}}, Type: "internal"}
 			json.NewEncoder(w).Encode(response)
 			return
 		}

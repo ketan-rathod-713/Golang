@@ -41,16 +41,16 @@ func (a *Api) HandleIssueOneBook(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		var errors []Error
+		var errors []models.Error
 		for _, err := range err.(validator.ValidationErrors) {
 			fmt.Println(err.Error())
 			fmt.Println(err.Field())
 
-			newError := Error{Field: err.Field(), Error: err.Error()}
+			newError := models.Error{Field: err.Field(), Error: err.Error()}
 			errors = append(errors, newError)
 		}
 
-		response := errorResponse{Errors: errors, Type: "validation"}
+		response := models.ErrorResponse{Errors: errors, Type: "validation"}
 		json.NewEncoder(w).Encode(response)
 		return
 	} else {
@@ -66,7 +66,7 @@ func (a *Api) HandleIssueOneBook(w http.ResponseWriter, r *http.Request) {
 		})
 
 		if err != nil {
-			response := errorResponse{Errors: []Error{Error{Field: "error", Error: err.Error()}}, Type: "validation"}
+			response := models.ErrorResponse{Errors: []models.Error{models.Error{Field: "error", Error: err.Error()}}, Type: "validation"}
 			json.NewEncoder(w).Encode(response)
 			return
 		}
@@ -77,13 +77,13 @@ func (a *Api) HandleIssueOneBook(w http.ResponseWriter, r *http.Request) {
 
 		bookId, err := primitive.ObjectIDFromHex(requestData.BookId)
 		if err != nil {
-			response := errorResponse{Errors: []Error{Error{Field: "bookId", Error: err.Error()}}, Type: "validation"}
+			response := models.ErrorResponse{Errors: []models.Error{models.Error{Field: "bookId", Error: err.Error()}}, Type: "validation"}
 			json.NewEncoder(w).Encode(response)
 			return
 		}
 		userId, err := primitive.ObjectIDFromHex(requestData.UserId)
 		if err != nil {
-			response := errorResponse{Errors: []Error{Error{Field: "userId", Error: err.Error()}}, Type: "validation"}
+			response := models.ErrorResponse{Errors: []models.Error{models.Error{Field: "userId", Error: err.Error()}}, Type: "validation"}
 			json.NewEncoder(w).Encode(response)
 			return
 		}
@@ -93,13 +93,13 @@ func (a *Api) HandleIssueOneBook(w http.ResponseWriter, r *http.Request) {
 		singleResult := a.App.DB.Collection("books").FindOne(context.TODO(), bson.M{"_id": bookId})
 		err = singleResult.Decode(&book)
 		if err != nil {
-			response := errorResponse{Errors: []Error{Error{Field: "error", Error: "Error decoding book from database"}}, Type: "internal"}
+			response := models.ErrorResponse{Errors: []models.Error{models.Error{Field: "error", Error: "Error decoding book from database"}}, Type: "internal"}
 			json.NewEncoder(w).Encode(response)
 			return
 		}
 
 		if book.Qty <= 0 {
-			response := errorResponse{Errors: []Error{Error{Field: "error", Error: "Not sufficient books to issue"}}, Type: "books"}
+			response := models.ErrorResponse{Errors: []models.Error{models.Error{Field: "error", Error: "Not sufficient books to issue"}}, Type: "books"}
 			json.NewEncoder(w).Encode(response)
 			return
 		}

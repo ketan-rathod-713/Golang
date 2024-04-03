@@ -12,6 +12,7 @@ Before running the API, make sure you have the following installed:
 - GoLang
 - MongoDB
 - Mux Router
+- Protoc for compiling .proto files
 
 ## API EndPoints
 

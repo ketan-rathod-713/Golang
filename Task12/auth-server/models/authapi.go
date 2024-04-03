@@ -13,3 +13,18 @@ type SignupRequest struct {
 	Standard string `json:"standard" validate:"required" bson:"standard,omitempty"`
 	Role     string `json:"role" bson:"role,omitempty" validate:"required"`
 }
+
+type SignInRequest struct {
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required"`
+}
+
+type ErrorResponse struct {
+	Errors []Error `json:"errors"`
+	Type   string  `json:"type"`
+}
+
+type Error struct { // can be validation error, internal error etc.
+	Field string `json:"field"`
+	Error string `json:"error"`
+}
