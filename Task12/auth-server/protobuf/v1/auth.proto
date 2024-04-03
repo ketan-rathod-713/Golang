@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+// version 1 proto file
+option go_package = "./v1";
+
+service Auth {
+    rpc AuthoriseUser(AuthoriseRequest) returns (AuthoriseResponse);
+    rpc GetUserDetails(UserDetailsRequest) returns (UserDetailsResponse);
+};
+
+message AuthoriseRequest {
+    string JwtToken = 1;
+    string Email = 2;
+};
+
+// in response what i will send to other servers
+// in authorise request no need to send whole data // hence send only important information only
+
+message AuthoriseResponse {
+    string ObjectId = 1;
+    string Email = 2;
+    string Name = 3;
+    string Role = 4;
+}
+
+// get user details based on email Id or object id
+message UserDetailsRequest {
+    string ObjectId = 1;
+    string Email = 2;
+}
+
+// it should be no response or a complete user detail
+message UserDetailsResponse {
+    string Error = 1;
+    User User = 2;
+}
+
+// Todo Declare Enum Type for Error in above case
+
+message User {
+    string ObjectId = 1;
+    string Email = 2;
+    string Phone = 3;
+    string Name = 4;
+    string Role = 5;
+    string Standard = 6;
+    string City = 7;
+    string State = 8;
+    string Country = 9;
+    string Address = 10;
+    string Zip = 11;
+}
