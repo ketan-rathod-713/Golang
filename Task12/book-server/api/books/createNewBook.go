@@ -74,7 +74,7 @@ func (a *Api) HandleCreateNewBook(w http.ResponseWriter, r *http.Request) {
 		token := r.URL.Query().Get("token")
 
 		// Authorise the given user
-		authUse := grpcclient.NewAuthUse(a.App.AuthClient)
+		authUse := grpcclient.NewAuthUse(a.App.AuthGrpcClient)
 
 		// need jwt token here
 		response, err := authUse.AuthoriseUser(token)

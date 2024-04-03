@@ -9,11 +9,6 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var (
-	// Token will expire after 5 minutes.
-	TokenExpiration = time.Now().Add(time.Minute * 5)
-)
-
 type Service interface {
 	GenerateJwtToken(user *UserClaims, config *models.Config) (string, error)
 	VerifyJwt(jwtToken string, config *models.Config) (*UserClaims, error)
@@ -37,7 +32,7 @@ func (s *service) GenerateJwtToken(user *UserClaims, config *models.Config) (str
 		Name:     user.Name,
 		Role:     user.Role,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: &jwt.NumericDate{Time: TokenExpiration},
+			ExpiresAt: &jwt.NumericDate{Time: time.Now().Add(time.Minute * 5)},
 			IssuedAt: &jwt.NumericDate{
 				Time: time.Now(),
 			},

@@ -3,9 +3,11 @@ syntax = "proto3";
 // version 1 proto file
 option go_package = "./v1";
 
+// I want internally all the services use authoriseUser service
 service Auth {
     rpc AuthoriseUser(AuthoriseRequest) returns (AuthoriseResponse);
     rpc GetUserDetails(UserDetailsRequest) returns (UserDetailsResponse);
+    rpc BookIssue(BookIssueRequest) returns (BookIssueResponse);
 };
 
 message AuthoriseRequest {
@@ -26,7 +28,6 @@ message AuthoriseResponse {
 // get user details based on email Id or object id
 message UserDetailsRequest {
     string ObjectId = 1;
-    string Email = 2;
 }
 
 // it should be no response or a complete user detail
@@ -49,4 +50,16 @@ message User {
     string Country = 9;
     string Address = 10;
     string Zip = 11;
+}
+
+// issue book to user
+message BookIssueRequest {
+    string UserJwtToken = 1; // i will get user details from this token only
+    string BookId = 2;
+}
+
+// just response which tells if book is issued or not.
+message BookIssueResponse {
+    bool Issued = 1;
+    string Error = 2; // if not issued then what error occured
 }

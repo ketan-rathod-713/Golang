@@ -61,3 +61,14 @@ func (s *AuthServer) AuthoriseUser(ctx context.Context, req *authGrpc.AuthoriseR
 func (s *AuthServer) GetUserDetails(context.Context, *authGrpc.UserDetailsRequest) (*authGrpc.UserDetailsResponse, error) {
 	return nil, nil
 }
+
+func (s *AuthServer) BookIssue(context.Context, *authGrpc.BookIssueRequest) (*authGrpc.BookIssueResponse, error) {
+	fmt.Println("Book issue karo bhai")
+
+	bookIssueResponse := authGrpc.BookIssueResponse{
+		Issued: true,
+		Error:  "no error",
+	}
+
+	return &bookIssueResponse, nil
+}

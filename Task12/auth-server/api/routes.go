@@ -6,7 +6,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func (a *api) InitializeRoutes(r *mux.Router) {
+func (a *Api) InitializeRoutes(r *mux.Router) {
 	// response type set to json
 	r.Use(mux.MiddlewareFunc(responseJsonMiddleware))
 

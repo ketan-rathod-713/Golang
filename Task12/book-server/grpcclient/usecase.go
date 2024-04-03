@@ -38,3 +38,14 @@ func (a *authClient) AuthoriseUser(token string) (*authGrpc.AuthoriseResponse, e
 
 	return response, nil
 }
+
+func (a *authClient) BookIssue(bookIssueRequest *authGrpc.BookIssueRequest) (*authGrpc.BookIssueResponse, error) {
+	response, err := a.Client.BookIssue(context.TODO(), bookIssueRequest)
+
+	if err != nil {
+		fmt.Println("Error Occured In GRPC server", err)
+		return nil, err
+	}
+
+	return response, nil
+}

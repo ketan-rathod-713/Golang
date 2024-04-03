@@ -24,6 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 type AuthClient interface {
 	AuthoriseUser(ctx context.Context, in *AuthoriseRequest, opts ...grpc.CallOption) (*AuthoriseResponse, error)
 	GetUserDetails(ctx context.Context, in *UserDetailsRequest, opts ...grpc.CallOption) (*UserDetailsResponse, error)
+	BookIssue(ctx context.Context, in *BookIssueRequest, opts ...grpc.CallOption) (*BookIssueResponse, error)
 }
 
 type authClient struct {
@@ -52,12 +53,22 @@ func (c *authClient) GetUserDetails(ctx context.Context, in *UserDetailsRequest,
 	return out, nil
 }
 
+func (c *authClient) BookIssue(ctx context.Context, in *BookIssueRequest, opts ...grpc.CallOption) (*BookIssueResponse, error) {
+	out := new(BookIssueResponse)
+	err := c.cc.Invoke(ctx, "/Auth/BookIssue", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServer is the server API for Auth service.
 // All implementations must embed UnimplementedAuthServer
 // for forward compatibility
 type AuthServer interface {
 	AuthoriseUser(context.Context, *AuthoriseRequest) (*AuthoriseResponse, error)
 	GetUserDetails(context.Context, *UserDetailsRequest) (*UserDetailsResponse, error)
+	BookIssue(context.Context, *BookIssueRequest) (*BookIssueResponse, error)
 	mustEmbedUnimplementedAuthServer()
 }
 
@@ -70,6 +81,9 @@ func (UnimplementedAuthServer) AuthoriseUser(context.Context, *AuthoriseRequest)
 }
 func (UnimplementedAuthServer) GetUserDetails(context.Context, *UserDetailsRequest) (*UserDetailsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserDetails not implemented")
+}
+func (UnimplementedAuthServer) BookIssue(context.Context, *BookIssueRequest) (*BookIssueResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method BookIssue not implemented")
 }
 func (UnimplementedAuthServer) mustEmbedUnimplementedAuthServer() {}
 
@@ -120,6 +134,24 @@ func _Auth_GetUserDetails_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Auth_BookIssue_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BookIssueRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServer).BookIssue(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Auth/BookIssue",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServer).BookIssue(ctx, req.(*BookIssueRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Auth_ServiceDesc is the grpc.ServiceDesc for Auth service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -134,6 +166,10 @@ var Auth_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUserDetails",
 			Handler:    _Auth_GetUserDetails_Handler,
+		},
+		{
+			MethodName: "BookIssue",
+			Handler:    _Auth_BookIssue_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

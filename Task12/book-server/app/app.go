@@ -8,12 +8,12 @@ import (
 
 type App struct {
 	DB         *mongo.Database
-	AuthClient authGrpc.AuthClient
+	AuthGrpcClient authGrpc.AuthClient
 }
 
 func New(db *mongo.Database, client authGrpc.AuthClient) *App {
 	return &App{
 		DB:         db,
-		AuthClient: client,
+		AuthGrpcClient: client,
 	}
 }

@@ -9,7 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type api struct {
+type Api struct {
 	DB         *mongo.Database
 	Config     *models.Config
 	JwtService jwtauth.Service
@@ -17,11 +17,11 @@ type api struct {
 	UserApi    *userapi.Api
 }
 
-func NewApi(db *mongo.Database, config *models.Config) *api {
+func NewApi(db *mongo.Database, config *models.Config) *Api {
 
 	// get jwt auth service
 
-	return &api{
+	return &Api{
 		DB:         db,
 		Config:     config,
 		JwtService: jwtauth.New(),
