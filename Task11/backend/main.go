@@ -52,12 +52,21 @@ func main() {
 		// insert to mongodb
 		env := app.LoadEnv()
 
-		client, err := app.InitDB(env)
-		if err != nil {
-			log.Fatal(err)
-		}
+		var client *mongo.Client = nil
+		var err error = nil
+		for {
+			client, err = app.InitDB(env)
+			if err != nil {
+				log.Fatal("Not connected to database", err)
 
-		log.Println("database connected successfully.")
+				log.Println("Sleeping for 5 seconds...")
+				time.Sleep(5 * time.Second)
+				continue
+			}
+
+			log.Println("database connected successfully.")
+			break
+		}
 
 		db := app.GetDB(client)
 		trains := app.GetCollectionTrain(db)

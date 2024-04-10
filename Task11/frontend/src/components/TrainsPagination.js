@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import Pagination from './Pagination';
-import sortup from "../icons/sortup.svg"
-import sortdown from "../icons/sortdown.svg"
+// import { configDotenv } from 'dotenv';
+// import env from "react-dotenv"
+
+// console.log( configDotenv)
+const BACKEND_HOST = "localhost" // jis host pe se service running hogi us host ka ip address hi to muje us container tak le jaega. think about it.
+const BACKEND_PORT = "8080"
 
 const TrainsPagination = () => {
     const [page, setPage] = useState(1)
@@ -61,8 +65,9 @@ const TrainsPagination = () => {
 
     useEffect(()=>{
         // before requesting 
+        console.log("Host and Port are ",BACKEND_HOST, BACKEND_PORT)
         console.log("state before request", page, limit, sort, order, searchText)
-        fetch(`http://localhost:8080/train?page=${page}&limit=${limit}&sort=${sort}&order=${order}&search=${searchText}`).then(response => {
+        fetch(`http://${BACKEND_HOST}:${BACKEND_PORT}/train?page=${page}&limit=${limit}&sort=${sort}&order=${order}&search=${searchText}`).then(response => {
             return response.json()
         }).then(response => {
             if(response.status){

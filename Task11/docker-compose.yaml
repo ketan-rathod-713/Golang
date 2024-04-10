@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  database:
+    container_name: mongod_container
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    networks:
+      coffee:
+        ipv4_address: 192.168.0.3
+
+  backend:
+    container_name: trains_backend
+    depends_on:
+      - database
+    build: ./backend
+    networks:
+      coffee:
+        ipv4_address: 192.168.0.4
+    ports:
+      - "8080:8080"
+    restart: always
+    environment:
+      MONGODB_URI: mongodb://root:example@192.168.0.3:27017/
+    volumes:
+      - ./backend:/usr/src/app
+
+  frontend:
+    container_name: trains_frontend
+    depends_on:
+      - backend
+      - database
+    build: ./frontend
+    networks:
+      coffee:
+        ipv4_address: 192.168.0.5
+    ports:
+      - "3000:3000"
+    restart: always
+    environment:
+      - BACKEND_HOST="192.168.0.4"
+      - BACKEND_PORT="8080"
+    volumes:
+      - ./frontend/:/react-example/
+      - /home/bacancy/Desktop/Bacancy/Golang/Task11/frontend/node_modules
+
+networks:
+  coffee:
+    ipam:
+      driver: default
+      config:
+        - subnet:  "192.168.0.0/16"

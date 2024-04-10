@@ -22,7 +22,7 @@ import (
 
 // connect to database with timeout of 20 sec.
 func InitDB(env *models.Env) (*mongo.Client, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(env.DB_URL))
@@ -73,10 +73,21 @@ func StartServer() {
 	// load env variables
 	env := LoadEnv()
 
-	// intialise database
-	client, err := InitDB(env)
-	if err != nil {
-		log.Fatal(err)
+	var client *mongo.Client
+	var err error
+
+	for {
+		client, err = InitDB(env)
+		if err != nil {
+			log.Fatal("Not connected to database", err)
+
+			log.Println("Sleeping for 5 seconds...")
+			time.Sleep(5 * time.Second)
+			continue
+		}
+
+		log.Println("database connected successfully.")
+		break
 	}
 
 	db := GetDB(client)
@@ -87,12 +98,12 @@ func StartServer() {
 		fmt.Fprintf(w, "Hello World!")
 	})
 
-	// GET /trains 
+	// GET /trains
 	// Example URL : /trains?page=1&limit=10&search=ahmedabad&sort="name"&order=1
 	// Get Paginated trains data with sorting of one field.
 	// If query params not given then default values will be as follows :
 	// page : 1, limit : 10, sort : "number", order : 1, search : ""
-	// TODO not using controllers for now. 
+	// TODO not using controllers for now.
 	http.HandleFunc("/train", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 
@@ -223,8 +234,6 @@ func StartServer() {
 			)
 		}
 	})
-
-
 
 	// Start Server On Given Port
 	log.Println("Server started on port", env.PORT)
