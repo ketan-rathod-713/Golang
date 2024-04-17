@@ -70,6 +70,7 @@ type ScrappedData struct {
 	URL               string   `json:"url"`
 	PageLinks         []string `json:"pageLinks"`
 	ImageLinks        []string `json:"imageLinks"`
+	References        []string `json:"references"`
 	ContentParagraphs []string `json:"contentParagraphs"`
 }
 

@@ -154,18 +154,25 @@ func HandleWikipediaScrap(w http.ResponseWriter, r *http.Request) {
 		}
 	})
 
-	doc.Find(".references").Each(func(i int, s *goquery.Selection) {
-		anchorTag := s.Find("a")
-
-		href, exist := anchorTag.Attr("href")
+	var references []string = make([]string, 0)
+	reference := doc.Find(".references")
+	reference.Find("a").Each(func(i int, s *goquery.Selection) {
+		href, exist := s.Attr("href")
+		// linkTitle := s.Text()
+		// FOR NOW NOT USING IT // TODO
 		if exist {
-			fmt.Println("href", href)
+			if strings.Contains(href, "cite") || strings.Contains(href, "ref") {
+
+			} else if strings.Contains(href, "http") {
+				references = append(references, href)
+			}
 		}
 	})
 
 	scrappedData.ContentParagraphs = texts
 	scrappedData.ImageLinks = links
 	scrappedData.URL = input.URL
+	scrappedData.References = references
 
 	json.NewEncoder(w).Encode(&models.ApiResponse{
 		Message: "successfully scrapped data",
