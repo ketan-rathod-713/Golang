@@ -31,3 +31,9 @@ go tool cover -html cover.out
 - localhost:8080/wikipedia_search
     - require: {"searchText":"Enter the keyword you want to search"}
     - Content-Type : application/json
+
+## Test Coverage
+
+![image](https://github.com/ketan-rathod-713/Golang/assets/76687839/fc6a7257-2f57-4a38-859e-5c6407be85a1)
+
+
