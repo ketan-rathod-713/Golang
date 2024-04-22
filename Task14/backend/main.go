@@ -17,12 +17,13 @@ func main() {
 
 	mx := mux.NewRouter()
 
-	// mx := http.NewServeMux()
-
 	// get search text from user and fetch data from wikepedia api
 	mx.HandleFunc("/wikipedia_search", handlers.HandleWikipediaSearch).Methods("POST")
 	mx.HandleFunc("/wikipedia_scrap", handlers.HandleWikipediaScrap).Methods("POST")
 
+	// Handle File Server.
+	fs := http.FileServer(http.Dir("static"))
+	mx.Handle("/", fs)
 	// handle all routes
 	mx.HandleFunc("/", handlers.CatchAllRouters)
 
