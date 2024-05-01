@@ -2,13 +2,13 @@ package graph
 
 import (
 	"context"
+	"fmt"
 	"meetmeup/models"
 )
 
 type userResolver struct{ *Resolver }
 
 // User returns UserResolver implementation.
-
 
 // Meetups is the resolver for the meetups field.
 func (r *userResolver) Meetups(ctx context.Context, obj *models.User) ([]*models.Meetup, error) {
@@ -22,8 +22,7 @@ func (r *userResolver) Meetups(ctx context.Context, obj *models.User) ([]*models
 	// 		result = append(result, m)
 	// 	}
 	// }
-
+	fmt.Println("Finding meetups for user", obj.ID)
 	// ? Using database
-
-	return nil, nil
+	return r.UserRepo.GetMeetupsByUserId(obj.ID)
 }

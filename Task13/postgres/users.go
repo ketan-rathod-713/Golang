@@ -20,3 +20,15 @@ func (m *UserRepo) GetUserById(id string) (*models.User, error) {
 
 	return &user, nil
 }
+
+func (m *UserRepo) GetMeetupsByUserId(id string) ([]*models.Meetup, error) {
+	var meetups []*models.Meetup
+
+	err := m.DB.Model(&meetups).Where("user_id = ?", id).Select()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return meetups, nil
+}

@@ -8,11 +8,10 @@ import (
 	"os"
 
 	"github.com/99designs/gqlgen/graphql/handler"
-	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/go-pg/pg/v10"
 )
 
-const defaultPort = "8081"
+const defaultPort = "8080"
 
 func main() {
 	DB := postgres.New(&pg.Options{
@@ -35,13 +34,37 @@ func main() {
 		UserRepo:   postgres.UserRepo{DB: DB},
 	}}
 
+	var SandboxHTML = []byte(`
+		<!DOCTYPE html>
+		<html lang="en">
+		<body style="margin: 0; overflow-x: hidden; overflow-y: hidden">
+		<div id="sandbox" style="height:100vh; width:100vw;"></div>
+		<script src="https://embeddable-sandbox.cdn.apollographql.com/_latest/embeddable-sandbox.umd.production.min.js"></script>
+		<script>
+		new window.EmbeddedSandbox({
+		target: "#sandbox",
+		initialEndpoint: "http://localhost:8080/query",
+		});
+		</script>
+		</body>
+		</html>`)
 
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(configs))
 
-	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	
+	// start file server
+	fs := http.FileServer(http.Dir("public"))
+
+	http.Handle("/", fs)
+
+	// http.Handle("/", playground.Handler("GraphQL playground", "/query"))
+
 	http.Handle("/query", graph.DataloaderMiddleware(DB, srv))
 
-	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
+	// For testing in local
+	http.Handle("/sandbox", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write(SandboxHTML)
+	}))
+
+	log.Printf("connect to http://localhost:%s/sandbox for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }

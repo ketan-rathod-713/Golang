@@ -3,6 +3,7 @@ package graph
 import (
 	"context"
 	"errors"
+	"fmt"
 	"meetmeup/graph/model"
 	"meetmeup/models"
 )
@@ -29,4 +30,9 @@ func (r *mutationResolver) CreateMeetup(ctx context.Context, input model.NewMeet
 	}
 
 	return r.MeetupRepo.CreateMeetup(meetup)
+}
+
+// UpdateMeetup is the resolver for the updateMeetup field.
+func (r *mutationResolver) UpdateMeetup(ctx context.Context, id string, input model.UpdateMeetup) (*models.Meetup, error) {
+	panic(fmt.Errorf("not implemented: UpdateMeetup - updateMeetup"))
 }

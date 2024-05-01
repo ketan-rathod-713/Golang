@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meetups Example</title>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      padding: 20px;
+    }
+
+    .heading {
+      text-align: center;
+      padding: 20px 0;
+      font-size: 28px;
+      color: #0056b3;
+    }
+
+    #meetup-list {
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 10px;
+      margin-top: 20px;
+    }
+
+    .meetup-element {
+      border-bottom: 1px solid #ddd;
+      padding: 10px 0;
+      cursor: pointer;
+    }
+
+    .meetup-element:last-child {
+      border-bottom: none;
+    }
+
+    .meetup-name {
+      font-size: 20px;
+      font-weight: bold;
+      color: #007bff;
+    }
+
+    .meetup-description {
+      color: #666;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .create-meetup {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 20px 350px;
+    }
+
+    .create-meetup input {
+      padding: 10px 10px;
+      font-size: 17px;
+    }
+
+  </style>
+</head>
+<body>
+  <h1 class="heading">Meetups</h1>
+
+  <div class="create-meetup">
+    <input id="input-title" type="text" placeholder="Enter Meetup Title" required>
+    <input id="input-description" type="text" placeholder="Enter Meetup Description" required>
+    <input id="input-userId" type="text" placeholder="Enter User Id" required>
+    <button id="create-meetup-btn">Create Meetup</button>
+  </div>
+
+  <div class="buttons">
+    <button id="fetch-meetups-btn">Fetch Meetups</button>
+    <button id="reset-btn">RESET</button>
+  </div>
+
+  <div id="meetup-list"></div>
+
+  
+
+  <script>
+    document.getElementById("fetch-meetups-btn").addEventListener("click", getMeetups);
+    document.getElementById("reset-btn").addEventListener("click", reset);
+    document.getElementById("create-meetup-btn").addEventListener("click", createMeetup);
+
+    const meetupList = document.getElementById("meetup-list");
+    const inputTitle = document.getElementById("input-title");
+    const inputDescription = document.getElementById("input-description");
+    const inputUserId = document.getElementById("input-userId");
+
+    async function createMeetup(){
+      if (inputTitle.value == "" || inputDescription.value == "" || inputUserId == "") {
+        alert("Enter All Fields")
+      } else {
+
+        const CREATE_MEETUP_QUERY = `
+        mutation CreateMeetup($input: NewMeetup!) {
+          createMeetup(input: $input) {
+            id,
+            description,
+            name
+          }
+        }
+        `
+
+        const variables = {
+          input: {
+            name: inputTitle.value,
+            description: inputDescription.value
+          }
+        }
+
+        console.log(JSON.stringify({ query: CREATE_MEETUP_QUERY, variables: variables}))
+
+        try {
+          const response = await fetch("http://localhost:8080/query", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ query: CREATE_MEETUP_QUERY, variables}),
+          });
+
+          const data = await response.json();
+
+          console.log(data)
+        } catch (error) {
+          console.log("Error fetching data");
+        }
+      }
+    }
+
+    async function reset(){
+      meetupList.innerHTML = ""
+      inputTitle.value = ""
+      inputDescription.value = ""
+      inputUserId.value = ""
+    }
+
+    async function getMeetups() {
+      meetupList.innerHTML = "";
+
+      const GET_ALL_MEETUPS_QUERY = `
+        query Meetups {
+          meetups {
+            id
+            name
+            description
+          }
+        }
+      `;
+
+      try {
+        const response = await fetch("http://localhost:8080/query", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ query: GET_ALL_MEETUPS_QUERY }),
+        });
+
+        const { data } = await response.json();
+
+        data.meetups.forEach(meetup => {
+          const meetupElement = document.createElement("div");
+          meetupElement.classList.add("meetup-element");
+          meetupElement.innerHTML = `
+            <h2 class="meetup-id">${meetup.id}</h2>
+            <h2 class="meetup-name">${meetup.name}</h2>
+            <p class="meetup-description">${meetup.description}</p>
+          `;
+          meetupList.appendChild(meetupElement);
+        });
+      } catch (error) {
+        console.error("Error fetching data", error);
+      }
+    }
+  </script>
+</body>
+</html>

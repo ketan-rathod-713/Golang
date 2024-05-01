@@ -31,3 +31,7 @@ func (m *MeetupRepo) CreateMeetup(meetup *models.Meetup) (*models.Meetup, error)
 
 	return meetup, nil
 }
+
+func (m *MeetupRepo) UpdateMeetup(meetup *models.Meetup) (*models.Meetup, error) {
+	return nil, nil
+}

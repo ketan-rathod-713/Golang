@@ -18,8 +18,14 @@ input NewMeetup {
   description: String!
 }
 
+input UpdateMeetup {
+  name: String 
+  description: String
+}
+
 type Mutation {
   createMeetup(input: NewMeetup!): Meetup 
+  updateMeetup(id: ID!, input: UpdateMeetup!): Meetup!
 }
 
 type Query {
