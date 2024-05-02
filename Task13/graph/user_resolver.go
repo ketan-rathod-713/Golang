@@ -2,7 +2,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 	"meetmeup/models"
 )
 
@@ -22,7 +21,7 @@ func (r *userResolver) Meetups(ctx context.Context, obj *models.User) ([]*models
 	// 		result = append(result, m)
 	// 	}
 	// }
-	fmt.Println("Finding meetups for user", obj.ID)
+	// fmt.Println("Finding meetups for user", obj.ID)
 	// ? Using database
 	return r.UserRepo.GetMeetupsByUserId(obj.ID)
 }

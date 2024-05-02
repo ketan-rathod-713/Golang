@@ -2,7 +2,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 	"meetmeup/models"
 )
 
@@ -36,7 +35,7 @@ func (r *meetupResolver) User(ctx context.Context, obj *models.Meetup) (*models.
 	// kya loader k pas sare users start me hi aa jaege. or it will just cashe the data whatever it gets.
 	data, err := GetUserLoader(ctx).Load(obj.UserId)
 
-	fmt.Println("data", data)
-	fmt.Println("err", err)
+	// fmt.Println("data", data)
+	// fmt.Println("err", err)
 	return data, err
 }

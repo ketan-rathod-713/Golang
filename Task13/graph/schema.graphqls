@@ -6,6 +6,11 @@ type User {
     meetups: [Meetup!]!
 }
 
+input NewUser {
+    username: String!
+    email: String!
+}
+
 type Meetup {
     id: ID!
     name: String!
@@ -16,6 +21,7 @@ type Meetup {
 input NewMeetup {
   name: String!
   description: String!
+  user_id: ID!
 }
 
 input UpdateMeetup {
@@ -26,8 +32,10 @@ input UpdateMeetup {
 type Mutation {
   createMeetup(input: NewMeetup!): Meetup 
   updateMeetup(id: ID!, input: UpdateMeetup!): Meetup!
+  createUser(input: NewUser!): User
 }
 
 type Query {
     meetups: [Meetup!]!
+    users: [User!]!
 }

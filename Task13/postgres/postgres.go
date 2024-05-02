@@ -2,7 +2,7 @@ package postgres
 
 import (
 	"context"
-	"fmt"
+	"log"
 
 	"github.com/go-pg/pg/v10"
 )
@@ -21,7 +21,7 @@ func (d DBLogger) AfterQuery(ctx context.Context, q *pg.QueryEvent) error {
 		return err
 	}
 
-	fmt.Println(string(query))
+	log.Println(string(query))
 
 	return nil
 }

@@ -1,11 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"meetmeup/graph"
+	"meetmeup/models"
 	"meetmeup/postgres"
 	"net/http"
-	"os"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/go-pg/pg/v10"
@@ -14,27 +15,31 @@ import (
 const defaultPort = "8080"
 
 func main() {
+	env, err := models.LoadEnv()
+
+	if err != nil {
+		log.Fatal("An Error Loading Environement Variables")
+	}
+
+	log.Println("Loaded Data From .ENV File")
+	log.Println(env)
+
 	DB := postgres.New(&pg.Options{
-		User:     "bacancy",
-		Password: "admin",
-		Database: "graphqlexample",
+		User:     env.DB_USER,
+		Password: env.DB_PASSWORD,
+		Database: env.DB_DATABASE,
 	})
 
 	defer DB.Close()
 
 	DB.AddQueryHook(postgres.DBLogger{})
 
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = defaultPort
-	}
-
 	configs := graph.Config{Resolvers: &graph.Resolver{
 		MeetupRepo: postgres.MeetupRepo{DB: DB},
 		UserRepo:   postgres.UserRepo{DB: DB},
 	}}
 
-	var SandboxHTML = []byte(`
+	var sandboxString = fmt.Sprintf(`
 		<!DOCTYPE html>
 		<html lang="en">
 		<body style="margin: 0; overflow-x: hidden; overflow-y: hidden">
@@ -43,11 +48,13 @@ func main() {
 		<script>
 		new window.EmbeddedSandbox({
 		target: "#sandbox",
-		initialEndpoint: "http://localhost:8080/query",
+		initialEndpoint: "http://localhost:%v/query",
 		});
 		</script>
 		</body>
-		</html>`)
+		</html>`, env.PORT)
+
+	var SandboxHTML = []byte(sandboxString)
 
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(configs))
 
@@ -55,7 +62,7 @@ func main() {
 	fs := http.FileServer(http.Dir("public"))
 
 	http.Handle("/", fs)
-
+	log.Printf("File Server Started On http://localhost:%v/", env.PORT)
 	// http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 
 	http.Handle("/query", graph.DataloaderMiddleware(DB, srv))
@@ -65,6 +72,9 @@ func main() {
 		w.Write(SandboxHTML)
 	}))
 
-	log.Printf("connect to http://localhost:%s/sandbox for GraphQL playground", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	log.Printf("connect to http://localhost:%s/sandbox for GraphQL playground", env.PORT)
+	fmt.Println("")
+
+	log.Fatal(http.ListenAndServe(":"+env.PORT, nil))
+
 }

@@ -26,7 +26,7 @@ func (r *mutationResolver) CreateMeetup(ctx context.Context, input model.NewMeet
 	meetup := &models.Meetup{
 		Name:        input.Name,
 		Description: input.Description,
-		UserId:      "1",
+		UserId:      input.UserID,
 	}
 
 	return r.MeetupRepo.CreateMeetup(meetup)

@@ -2,7 +2,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 	"meetmeup/models"
 	"net/http"
 	"time"
@@ -17,6 +16,8 @@ import (
 
 const userloaderKey = "userloader"
 
+// ! TODO
+// TODO: Check it how it is working & how can i use it for other queries too.
 func DataloaderMiddleware(db *pg.DB, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		userloader := UserLoader{
@@ -42,12 +43,12 @@ func DataloaderMiddleware(db *pg.DB, next http.Handler) http.Handler {
 				err := db.Model(&users).Where("id IN (?)", pg.In(ids)).Select()
 
 				if err != nil {
-					fmt.Println("Error in loader", err)
+					// fmt.Println("Error in loader", err)
 					return nil, []error{err}
 				}
 
 				// send users in sync
-				fmt.Println("Sync ids", ids)
+				// fmt.Println("Sync ids", ids)
 
 				u := make(map[string]*models.User, len(users))
 

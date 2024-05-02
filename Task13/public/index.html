@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Meetups Example</title>
+  <title>Meetups Graphql Example</title>
   <style>
     * {
       padding: 0;
@@ -82,15 +82,41 @@
       font-size: 17px;
     }
 
+    select {
+      padding: 10px 10px;
+      font-size: 15px;
+      color: black;
+    }
+
+    .input-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
   </style>
 </head>
 <body>
   <h1 class="heading">Meetups</h1>
 
   <div class="create-meetup">
-    <input id="input-title" type="text" placeholder="Enter Meetup Title" required>
-    <input id="input-description" type="text" placeholder="Enter Meetup Description" required>
-    <input id="input-userId" type="text" placeholder="Enter User Id" required>
+    <div class="input-wrapper">
+      <label for="input-title">Meetup Title</label>
+      <input id="input-title" type="text" placeholder="Enter Meetup Title" required>
+    </div>
+
+    <div class="input-wrapper">
+      <label for="input-description">Meetup Description</label>
+      <input id="input-description" type="text" placeholder="Enter Meetup Description" required>  
+    </div>
+    <!-- <input id="input-userId" type="text" placeholder="E" required> -->
+
+    <div class="input-wrapper">
+      <label for="userId">UserId</label>
+      <select name="input-userId" id="input-userId" required>
+        <!-- options will be loaded by javascript -->
+      </select>
+    </div>
     <button id="create-meetup-btn">Create Meetup</button>
   </div>
 
@@ -104,15 +130,26 @@
   
 
   <script>
+
+    // constant environmenet variables
+    const PORT = "8080"
+    const HOST = "localhost"
+
+    // apply listeners for button clicks
     document.getElementById("fetch-meetups-btn").addEventListener("click", getMeetups);
     document.getElementById("reset-btn").addEventListener("click", reset);
     document.getElementById("create-meetup-btn").addEventListener("click", createMeetup);
 
+    // initially get all the users data.
+    getUsers()
+
+    // input and list variables
     const meetupList = document.getElementById("meetup-list");
     const inputTitle = document.getElementById("input-title");
     const inputDescription = document.getElementById("input-description");
     const inputUserId = document.getElementById("input-userId");
 
+    // create meetup using input data provided.
     async function createMeetup(){
       if (inputTitle.value == "" || inputDescription.value == "" || inputUserId == "") {
         alert("Enter All Fields")
@@ -131,7 +168,8 @@
         const variables = {
           input: {
             name: inputTitle.value,
-            description: inputDescription.value
+            description: inputDescription.value,
+            user_id: inputUserId.value
           }
         }
 
@@ -146,15 +184,31 @@
             body: JSON.stringify({ query: CREATE_MEETUP_QUERY, variables}),
           });
 
-          const data = await response.json();
+          const response_data = await response.json();
+          console.log(response_data)
 
-          console.log(data)
-        } catch (error) {
-          console.log("Error fetching data");
+          const {data, errors} = response_data
+
+          console.log(typeof errors, Array.isArray(errors))
+          
+          if (errors && errors.length > 0){
+              for (let index = 0; index < errors.length; index++) {
+                const err = errors[index];
+
+                alert(err.message, err.path.toString())
+              }
+          } else {
+            alert("Data Inserted.")
+            reset()
+          }
+
+        } catch (Error) {
+            console.log("Error Fetching Data", Error)
         }
       }
     }
 
+    // reset function will reset values input title, description etc. to empty string
     async function reset(){
       meetupList.innerHTML = ""
       inputTitle.value = ""
@@ -162,6 +216,7 @@
       inputUserId.value = ""
     }
 
+    // fetch all the meetups with their id, name and description
     async function getMeetups() {
       meetupList.innerHTML = "";
 
@@ -176,7 +231,7 @@
       `;
 
       try {
-        const response = await fetch("http://localhost:8080/query", {
+        const response = await fetch(`http://${HOST}:${PORT}/query`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -200,6 +255,51 @@
         console.error("Error fetching data", error);
       }
     }
+  
+    // fetch all the users initially.
+    async function getUsers(){
+      // usersList.innerHTML = "";
+
+      const GET_ALL_USERS_QUERY = `
+      query users {
+          users {
+            id,
+            email
+          }
+        }
+      `;
+
+      try {
+        const response = await fetch(`http://${HOST}:${PORT}/query`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ query: GET_ALL_USERS_QUERY }),
+        });
+
+        const { data } = await response.json();
+
+        const {users, errors} = data;
+
+        if(errors && errors.length > 0){
+          // handle errors
+        } else {
+          users.forEach(user => {
+            console.log(user)
+            let userOption = document.createElement("option")
+            userOption.id = user.id 
+            userOption.value = user.id;
+            userOption.text = user.id + " " + user.email
+
+            inputUserId.appendChild(userOption)
+          })
+        }
+      } catch (error) {
+        console.error("Error fetching data", error);
+      }
+    }
+
   </script>
 </body>
 </html>
