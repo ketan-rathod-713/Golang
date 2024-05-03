@@ -68,6 +68,8 @@
       display: flex;
       gap: 10px;
       justify-content: center;
+      margin-top: 20px;
+      margin-bottom: 20px;
     }
 
     .create-meetup {
@@ -94,6 +96,10 @@
       gap: 5px;
     }
 
+    hr {
+      border: 2px dashed grey;
+    }
+
   </style>
 </head>
 <body>
@@ -118,13 +124,22 @@
       </select>
     </div>
     <button id="create-meetup-btn">Create Meetup</button>
+    
+    <hr>
+    <div class="input-wrapper">
+      <input id="searchText" type="text" placeholder="Enter Description To Search" required>  
+      <button id="searchTextBtn">Search Meetups By Description</button>
+    </div>
   </div>
 
+  <hr>
   <div class="buttons">
-    <button id="fetch-meetups-btn">Fetch Meetups</button>
+    <button id="fetch-meetups-btn">Fetch All Meetups</button>
     <button id="reset-btn">RESET</button>
   </div>
 
+  <hr>
+  <div id="search-meetup-list"></div>
   <div id="meetup-list"></div>
 
   
@@ -139,6 +154,7 @@
     document.getElementById("fetch-meetups-btn").addEventListener("click", getMeetups);
     document.getElementById("reset-btn").addEventListener("click", reset);
     document.getElementById("create-meetup-btn").addEventListener("click", createMeetup);
+    document.getElementById("searchTextBtn").addEventListener("click", searchMeetupsBySearchText);
 
     // initially get all the users data.
     getUsers()
@@ -148,6 +164,8 @@
     const inputTitle = document.getElementById("input-title");
     const inputDescription = document.getElementById("input-description");
     const inputUserId = document.getElementById("input-userId");
+    const searchMeetupList = document.getElementById("search-meetup-list");
+    const searchText = document.getElementById("searchText");
 
     // create meetup using input data provided.
     async function createMeetup(){
@@ -214,6 +232,7 @@
       inputTitle.value = ""
       inputDescription.value = ""
       inputUserId.value = ""
+      searchMeetupList.innerHTML = ""
     }
 
     // fetch all the meetups with their id, name and description
@@ -240,6 +259,8 @@
         });
 
         const { data } = await response.json();
+
+        console.log(data)
 
         data.meetups.forEach(meetup => {
           const meetupElement = document.createElement("div");
@@ -300,6 +321,79 @@
       }
     }
 
+    async function searchMeetupsBySearchText(){
+      // first reset previos configuration
+      reset()
+
+      const GET_MEETUPS_BY_DESCRIPTION = `
+      query Meetups($input: Search) {
+        meetups(input: $input) {
+          id,
+          description
+        }
+      }
+      `;
+
+      const variables = {
+          input: {
+            searchText: searchText.value
+          }
+        }
+
+        try {
+          const response = await fetch("http://localhost:8080/query", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ query: GET_MEETUPS_BY_DESCRIPTION, variables}),
+          });
+
+          const response_data = await response.json();
+          console.log(response_data)
+
+          const {data, errors} = response_data
+
+          console.log(typeof errors, Array.isArray(errors))
+          
+          if (errors && errors.length > 0){
+              for (let index = 0; index < errors.length; index++) {
+                const err = errors[index];
+
+                alert(err.message, err.path.toString())
+              }
+          } else {
+            // display all meetups
+            data.meetups.forEach(meetup => {
+              let meetupWrapper = document.createElement("div")
+              meetupWrapper.classList.add("meetup-element")
+
+              let name = document.createElement("h2")
+              name.textContent = meetup.name;
+              name.classList.add("meetup-name")
+
+              let description = document.createElement("p")
+              description.textContent = meetup.description;
+              description.classList.add("meetup-description")
+
+
+              let id = document.createElement("h1")
+              id.textContent = meetup.id;
+              id.classList.add("meetup-id")
+
+
+              meetupWrapper.appendChild(id)
+              meetupWrapper.appendChild(name)
+              meetupWrapper.appendChild(description)
+
+              searchMeetupList.appendChild(meetupWrapper)
+            })
+          }
+
+        } catch (Error) {
+            console.log("Error Fetching Data", Error)
+        }
+    }
   </script>
 </body>
 </html>

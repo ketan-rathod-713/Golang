@@ -14,6 +14,7 @@ type DBLogger struct {
 func (d DBLogger) BeforeQuery(ctx context.Context, q *pg.QueryEvent) (context.Context, error) {
 	return ctx, nil
 }
+
 func (d DBLogger) AfterQuery(ctx context.Context, q *pg.QueryEvent) error {
 	query, err := q.FormattedQuery()
 

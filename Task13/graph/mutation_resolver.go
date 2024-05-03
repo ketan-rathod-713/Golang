@@ -10,6 +10,15 @@ import (
 
 type mutationResolver struct{ *Resolver }
 
+// CreateUser is the resolver for the createUser field.
+func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*models.User, error) {
+	var user models.User = models.User{
+		Username: input.Username,
+		Email:    input.Email,
+	}
+	return r.UserRepo.CreateUser(user)
+}
+
 // CreateMeetup is the resolver for the createMeetup field.
 func (r *mutationResolver) CreateMeetup(ctx context.Context, input model.NewMeetup) (*models.Meetup, error) {
 

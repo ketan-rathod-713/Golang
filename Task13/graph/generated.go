@@ -64,7 +64,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Meetups func(childComplexity int) int
+		Meetups func(childComplexity int, input *model.Search) int
 		Users   func(childComplexity int) int
 	}
 
@@ -85,7 +85,7 @@ type MutationResolver interface {
 	CreateUser(ctx context.Context, input model.NewUser) (*models.User, error)
 }
 type QueryResolver interface {
-	Meetups(ctx context.Context) ([]*models.Meetup, error)
+	Meetups(ctx context.Context, input *model.Search) ([]*models.Meetup, error)
 	Users(ctx context.Context) ([]*models.User, error)
 }
 type UserResolver interface {
@@ -180,7 +180,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Query.Meetups(childComplexity), true
+		args, err := ec.field_Query_meetups_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Meetups(childComplexity, args["input"].(*model.Search)), true
 
 	case "Query.users":
 		if e.complexity.Query.Users == nil {
@@ -227,6 +232,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputNewMeetup,
 		ec.unmarshalInputNewUser,
+		ec.unmarshalInputSearch,
 		ec.unmarshalInputUpdateMeetup,
 	)
 	first := true
@@ -410,6 +416,21 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_meetups_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.Search
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalOSearch2ᚖmeetmeupᚋgraphᚋmodelᚐSearch(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
 	return args, nil
 }
 
@@ -840,7 +861,7 @@ func (ec *executionContext) _Query_meetups(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Meetups(rctx)
+		return ec.resolvers.Query().Meetups(rctx, fc.Args["input"].(*model.Search))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -876,6 +897,17 @@ func (ec *executionContext) fieldContext_Query_meetups(ctx context.Context, fiel
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Meetup", field.Name)
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_meetups_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -3097,6 +3129,33 @@ func (ec *executionContext) unmarshalInputNewUser(ctx context.Context, obj inter
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputSearch(ctx context.Context, obj interface{}) (model.Search, error) {
+	var it model.Search
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"searchText"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "searchText":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("searchText"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SearchText = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdateMeetup(ctx context.Context, obj interface{}) (model.UpdateMeetup, error) {
 	var it model.UpdateMeetup
 	asMap := map[string]interface{}{}
@@ -4246,6 +4305,14 @@ func (ec *executionContext) marshalOMeetup2ᚖmeetmeupᚋmodelsᚐMeetup(ctx con
 		return graphql.Null
 	}
 	return ec._Meetup(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOSearch2ᚖmeetmeupᚋgraphᚋmodelᚐSearch(ctx context.Context, v interface{}) (*model.Search, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputSearch(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {

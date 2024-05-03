@@ -32,6 +32,20 @@ func (m *MeetupRepo) CreateMeetup(meetup *models.Meetup) (*models.Meetup, error)
 	return meetup, nil
 }
 
+// Not Implemented.
 func (m *MeetupRepo) UpdateMeetup(meetup *models.Meetup) (*models.Meetup, error) {
 	return nil, nil
+}
+
+func (m *MeetupRepo) GetMeetupsBySearchText(searchText string) ([]*models.Meetup, error) {
+	var meetups []*models.Meetup
+
+	// all descriptions starting with searchText
+	err := m.DB.Model(&meetups).Where("description LIKE ?", searchText+"%").Select()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return meetups, nil
 }

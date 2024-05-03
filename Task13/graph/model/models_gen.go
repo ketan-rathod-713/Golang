@@ -19,6 +19,10 @@ type NewUser struct {
 type Query struct {
 }
 
+type Search struct {
+	SearchText *string `json:"searchText,omitempty"`
+}
+
 type UpdateMeetup struct {
 	Name        *string `json:"name,omitempty"`
 	Description *string `json:"description,omitempty"`

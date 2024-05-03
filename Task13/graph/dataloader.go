@@ -58,7 +58,8 @@ func DataloaderMiddleware(db *pg.DB, next http.Handler) http.Handler {
 
 				result := make([]*models.User, len(ids))
 
-				// ig error here
+				// Result we got from database will not be same as we provided id's sequence.
+				// For same sequence we are doing this.
 				for i, id := range ids {
 					result[i] = u[id]
 				}

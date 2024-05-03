@@ -15,6 +15,7 @@ import (
 const defaultPort = "8080"
 
 func main() {
+	// load environment variables
 	env, err := models.LoadEnv()
 
 	if err != nil {
@@ -32,6 +33,7 @@ func main() {
 
 	defer DB.Close()
 
+	// For printing sql queries run during current session
 	DB.AddQueryHook(postgres.DBLogger{})
 
 	configs := graph.Config{Resolvers: &graph.Resolver{
