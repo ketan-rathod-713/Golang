@@ -40,3 +40,7 @@ go run main.go
 ```
 
 3. Open URL shown in console and see playground and try making different queries.
+
+## Preview
+
+![image](https://github.com/ketan-rathod-713/Golang/assets/76687839/8da8fa88-9482-43af-a8cc-eb61e5767d57)
