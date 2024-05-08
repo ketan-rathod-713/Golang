@@ -6,13 +6,12 @@ package graph
 
 import (
 	"context"
-	"fmt"
 	"graphql_search/models"
 )
 
-// GetAllBoards is the resolver for the getAllBoards field.
-func (r *queryResolver) GetAllBoards(ctx context.Context) ([]*models.Board, error) {
-	panic(fmt.Errorf("not implemented: GetAllBoards - getAllBoards"))
+// GetAllBoardsByTitle is the resolver for the GetAllBoardsByTitle field.
+func (r *queryResolver) GetAllBoardsByTitle(ctx context.Context, title string) ([]*models.Board, error) {
+	return r.Api.BoardApi.GetBoardsByTitle(title)
 }
 
 // Query returns QueryResolver implementation.

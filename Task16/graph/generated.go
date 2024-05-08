@@ -56,12 +56,12 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		GetAllBoards func(childComplexity int) int
+		GetAllBoardsByTitle func(childComplexity int, title string) int
 	}
 }
 
 type QueryResolver interface {
-	GetAllBoards(ctx context.Context) ([]*models.Board, error)
+	GetAllBoardsByTitle(ctx context.Context, title string) ([]*models.Board, error)
 }
 
 type executableSchema struct {
@@ -125,12 +125,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Board.Visible(childComplexity), true
 
-	case "Query.getAllBoards":
-		if e.complexity.Query.GetAllBoards == nil {
+	case "Query.GetAllBoardsByTitle":
+		if e.complexity.Query.GetAllBoardsByTitle == nil {
 			break
 		}
 
-		return e.complexity.Query.GetAllBoards(childComplexity), true
+		args, err := ec.field_Query_GetAllBoardsByTitle_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetAllBoardsByTitle(childComplexity, args["title"].(string)), true
 
 	}
 	return 0, false
@@ -239,6 +244,21 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) field_Query_GetAllBoardsByTitle_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["title"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["title"] = arg0
+	return args, nil
+}
 
 func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -557,8 +577,8 @@ func (ec *executionContext) fieldContext_Board_type(_ context.Context, field gra
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_getAllBoards(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_getAllBoards(ctx, field)
+func (ec *executionContext) _Query_GetAllBoardsByTitle(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_GetAllBoardsByTitle(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -571,7 +591,7 @@ func (ec *executionContext) _Query_getAllBoards(ctx context.Context, field graph
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetAllBoards(rctx)
+		return ec.resolvers.Query().GetAllBoardsByTitle(rctx, fc.Args["title"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -588,7 +608,7 @@ func (ec *executionContext) _Query_getAllBoards(ctx context.Context, field graph
 	return ec.marshalNBoard2ᚕᚖgraphql_searchᚋmodelsᚐBoardᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_getAllBoards(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_GetAllBoardsByTitle(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -611,6 +631,17 @@ func (ec *executionContext) fieldContext_Query_getAllBoards(_ context.Context, f
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Board", field.Name)
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_GetAllBoardsByTitle_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -2608,7 +2639,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
-		case "getAllBoards":
+		case "GetAllBoardsByTitle":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -2617,7 +2648,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_getAllBoards(ctx, field)
+				res = ec._Query_GetAllBoardsByTitle(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}

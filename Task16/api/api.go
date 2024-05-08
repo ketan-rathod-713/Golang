@@ -2,6 +2,7 @@ package api
 
 import (
 	"graphql_search/api/board"
+	"graphql_search/models"
 
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -11,9 +12,9 @@ type Api struct {
 	BoardApi board.BoardApi
 }
 
-func New(client *mongo.Client) *Api {
+func New(client *mongo.Client, configs *models.Configs) *Api {
 	return &Api{
 		Client:   client,
-		BoardApi: board.New(client.Database("task16")),
+		BoardApi: board.New(client.Database(configs.DATABASE)),
 	}
 }
