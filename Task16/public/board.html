@@ -48,6 +48,7 @@
     <h2>Board Info</h2>
 
     <div class="board-container">
+        <div class="board-info" id="Id"></div>
         <div class="board-info" id="boardId"></div>
         <div class="board-info" id="boardTitle"></div>
         <div class="board-info" id="boardDescription"></div>
@@ -97,7 +98,10 @@
                     console.log("error occurred");
                 } else {
                     const {board} = data;
+
+                    console.log(board)
                     // Display board data in the relevant divs
+                    document.getElementById('Id').innerText = `ID: ${board.Id}`;
                     document.getElementById('boardId').innerText = `Board ID: ${board.boardId}`;
                     document.getElementById('boardTitle').innerText = `Title: ${board.title}`;
                     document.getElementById('boardDescription').innerText = `Description: ${board.description}`;

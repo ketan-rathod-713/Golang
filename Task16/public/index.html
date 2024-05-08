@@ -52,6 +52,7 @@
 
         #suggestions {
             max-height: 200px;
+            overflow-x: hidden;
             overflow-y: auto;
             width: 100%;
         }
@@ -82,7 +83,7 @@
 </div>
 <div class="container">
     <div class="search-box">
-        <input type="text" id="searchInput" placeholder="Search Boards By Title">
+        <input type="text" id="searchInput" placeholder="Search Boards By Title, Description Or Id">
         <div id="suggestions"></div>
     </div>
 </div>
@@ -102,7 +103,7 @@
     function showBoardInfo(boardId){
         const url = `board.html?boardId=${boardId}`;
         // Navigate to the URL
-        window.location.href = url;
+        window.open(url, '_blank');
     }
 
     function fetchResults(query) {
