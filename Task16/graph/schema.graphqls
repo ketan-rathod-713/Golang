@@ -1,0 +1,16 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+type Board {
+  Id: ID!
+  boardId: String!
+  visible: String!
+  description: String!
+  title: String!
+  type: String!
+}
+
+type Query {
+  getAllBoards: [Board!]!
+}
