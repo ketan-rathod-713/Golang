@@ -1,0 +1,35 @@
+
+
+type Product {
+    Id: ID!
+    Name: String!
+    Description: String!
+    Quantity: Int!
+    Price:  Float!
+    Category: Category!
+}
+
+type Category {
+    Id: ID!
+    Name: String!
+    Products: [Product!]!
+}
+
+input Pagination {
+    first: Int!
+    offset: Int!
+}
+
+type Query {
+    GetProducts(Pagination: Pagination): [Product!]!
+    GetProduct(id: ID!): Product!
+
+    getCategories(Pagination: Pagination): [Category!]!
+    getCategory(id: ID!): Category!
+}
+
+type Mutation {
+    CreateProduct(name: String!, description: String!, price: Float!, quantity: Int!, Category: ID!): Product!
+
+    CreateCategory(name: String!): Category!
+}
