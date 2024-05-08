@@ -13,9 +13,13 @@ type Board struct {
 
 type BoardDB struct {
 	ID          primitive.ObjectID `json:"Id" bson:"_id"`
-	BoardID     string             `json:"boardId"`
+	BoardID     BoardIdData        `json:"boardId"`
 	Visible     string             `json:"visible"`
 	Description string             `json:"description"`
 	Title       string             `json:"title"`
 	Type        string             `json:"type"`
+}
+
+type BoardIdData struct {
+	Id primitive.ObjectID `bson:"_id"`
 }

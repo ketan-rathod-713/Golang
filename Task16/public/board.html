@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Board Info</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        .board-container {
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            max-width: 600px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .board-info {
+            font-size: 18px;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .board-info:last-child {
+            border-bottom: none;
+        }
+
+        .board-info span {
+            font-weight: bold;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <h2>Board Info</h2>
+
+    <div class="board-container">
+        <div class="board-info" id="boardId"></div>
+        <div class="board-info" id="boardTitle"></div>
+        <div class="board-info" id="boardDescription"></div>
+        <div class="board-info" id="boardVisible"></div>
+        <div class="board-info" id="boardType"></div>
+    </div>
+
+    <script>
+        const HOST = "localhost"
+        const PORT = "8080"
+
+        function showBoardInfo() {
+            // Get the boardId from the URL query parameter
+            const params = new URLSearchParams(window.location.search);
+            const boardId = params.get('boardId');
+            // Display boardId in the console
+            console.log(boardId);
+
+            getBoardInfo(boardId)
+        }
+
+        function getBoardInfo(boardId){
+            const GET_BOARD_INFO = `
+            query example {
+                board: GetBoard(id:"${boardId}"){
+                            Id,
+                            boardId,
+                            title,
+                            description,
+                            visible,
+                            type
+                        }
+            }
+            `;
+
+            try {
+            fetch(`http://${HOST}:${PORT}/query`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({query: GET_BOARD_INFO}),
+            }).then(
+                response => response.json()
+            ).then(data => data.data).then(data => {
+                if (data.errors) {
+                    console.log("error occurred");
+                } else {
+                    const {board} = data;
+                    // Display board data in the relevant divs
+                    document.getElementById('boardId').innerText = `Board ID: ${board.boardId}`;
+                    document.getElementById('boardTitle').innerText = `Title: ${board.title}`;
+                    document.getElementById('boardDescription').innerText = `Description: ${board.description}`;
+                    document.getElementById('boardVisible').innerText = `Visible: ${board.visible}`;
+                    document.getElementById('boardType').innerText = `Type: ${board.type}`;
+                }
+            })
+        } catch (err) {
+            console.log(err);
+        }
+        }
+
+        // Call the function when the page loads
+        window.onload = showBoardInfo;
+    </script>
+</body>
+</html>

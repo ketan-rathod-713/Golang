@@ -28,13 +28,18 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
+	// static content
+	fileServerHandler := http.FileServer(http.Dir("public"))
+	http.Handle("/", fileServerHandler)
+
 	resolver := &graph.Resolver{Api: api.New(client, configs)}
 
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: resolver}))
 
-	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	http.Handle("/playground", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", srv)
 
-	log.Printf("connect to http://localhost:%s/ for GraphQL playground", configs.PORT)
+	log.Printf("connect to http://localhost:%s/playground for GraphQL playground", configs.PORT)
+	log.Printf("connect to http://localhost:%s/ for Home Page", configs.PORT)
 	log.Fatal(http.ListenAndServe(":"+configs.PORT, nil))
 }

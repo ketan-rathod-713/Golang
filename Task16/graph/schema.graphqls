@@ -13,4 +13,5 @@ type Board {
 
 type Query {
   GetAllBoardsByTitle(title: String!): [Board!]!
+  GetBoard(id: ID!): Board!
 }

@@ -14,6 +14,11 @@ func (r *queryResolver) GetAllBoardsByTitle(ctx context.Context, title string) (
 	return r.Api.BoardApi.GetBoardsByTitle(title)
 }
 
+// GetBoard is the resolver for the GetBoard field.
+func (r *queryResolver) GetBoard(ctx context.Context, id string) (*models.Board, error) {
+	return r.Api.BoardApi.GetBoard(id)
+}
+
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 

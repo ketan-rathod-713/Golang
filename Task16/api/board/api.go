@@ -18,4 +18,5 @@ func New(db *mongo.Database) *api {
 
 type BoardApi interface {
 	GetBoardsByTitle(title string) ([]*models.Board, error)
+	GetBoard(id string) (*models.Board, error)
 }
