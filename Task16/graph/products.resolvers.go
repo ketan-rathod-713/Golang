@@ -6,49 +6,66 @@ package graph
 
 import (
 	"context"
+	"fmt"
+	"graphql_search/graph/model"
 	"graphql_search/models"
 )
 
 // Products is the resolver for the Products field.
 func (r *categoryResolver) Products(ctx context.Context, obj *models.Category) ([]*models.Product, error) {
 	// get all products in given category.
-	return r.Api.CategoryApi.GetProductsByCategory(obj)
+	return r.Api.CategoryApi.GetProductsByCategory(ctx, obj)
 }
 
 // CreateProduct is the resolver for the CreateProduct field.
 func (r *mutationResolver) CreateProduct(ctx context.Context, name string, description string, price float64, quantity int, category string) (*models.Product, error) {
-	return r.Api.ProductApi.Create(name, description, price, quantity, category)
+	return r.Api.ProductApi.Create(ctx, name, description, price, quantity, category)
 }
 
 // CreateCategory is the resolver for the CreateCategory field.
 func (r *mutationResolver) CreateCategory(ctx context.Context, name string) (*models.Category, error) {
-	return r.Api.CategoryApi.Create(name)
+	return r.Api.CategoryApi.Create(ctx, name)
+}
+
+// RegisterUser is the resolver for the RegisterUser field.
+func (r *mutationResolver) RegisterUser(ctx context.Context, name string, emailID string, phoneNumber string, address model.AddressInput) (*model.User, error) {
+	return r.Api.UserApi.RegisterUser(ctx, name, emailID, phoneNumber, address)
+}
+
+// SignInUser is the resolver for the SignInUser field.
+func (r *mutationResolver) SignInUser(ctx context.Context, id string) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: SignInUser - SignInUser"))
 }
 
 // Category is the resolver for the Category field.
 func (r *productResolver) Category(ctx context.Context, obj *models.Product) (*models.Category, error) {
-	return r.Api.CategoryApi.Get(obj.Category.ID)
+	return r.Api.CategoryApi.Get(ctx, obj.Category.ID)
 }
 
 // GetProducts is the resolver for the GetProducts field.
 func (r *queryResolver) GetProducts(ctx context.Context, pagination *models.Pagination) ([]*models.Product, error) {
-	return r.Api.ProductApi.GetAll(pagination)
+	return r.Api.ProductApi.GetAll(ctx, pagination)
 }
 
 // GetProduct is the resolver for the GetProduct field.
 func (r *queryResolver) GetProduct(ctx context.Context, id string) (*models.Product, error) {
-	return r.Api.ProductApi.Get(id)
+	return r.Api.ProductApi.Get(ctx, id)
 }
 
 // GetCategories is the resolver for the getCategories field.
 func (r *queryResolver) GetCategories(ctx context.Context, pagination *models.Pagination) ([]*models.Category, error) {
 	// We don't need pagination for categories.
-	return r.Api.CategoryApi.GetAll(nil)
+	return r.Api.CategoryApi.GetAll(ctx, nil)
 }
 
 // GetCategory is the resolver for the getCategory field.
 func (r *queryResolver) GetCategory(ctx context.Context, id string) (*models.Category, error) {
-	return r.Api.CategoryApi.Get(id)
+	return r.Api.CategoryApi.Get(ctx, id)
+}
+
+// GetAllUsers is the resolver for the GetAllUsers field.
+func (r *queryResolver) GetAllUsers(ctx context.Context, authToken string) ([]*model.User, error) {
+	return r.Api.UserApi.GetAllUsers(ctx, authToken)
 }
 
 // Category returns CategoryResolver implementation.

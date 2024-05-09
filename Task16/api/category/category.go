@@ -10,13 +10,13 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func (a *api) Create(name string) (*models.Category, error) {
+func (a *api) Create(ctx context.Context, name string) (*models.Category, error) {
 	var category models.Category = models.Category{
 		Name: name,
 	}
-	ctx, _ := context.WithTimeout(context.Background(), 2*time.Second)
+	// ctx, _ := context.WithTimeout(context.Background(), 2*time.Second)
 
-	result, err := a.Database.Collection("category").InsertOne(ctx, bson.M{
+	result, err := a.Database.Collection(a.DB_Collections.CATEGORY).InsertOne(ctx, bson.M{
 		"name": name,
 	})
 
@@ -30,27 +30,38 @@ func (a *api) Create(name string) (*models.Category, error) {
 	return &category, nil
 }
 
-func (a *api) Get(id string) (*models.Category, error) {
-	log.Println("Fetch Category By Id")
+func (a *api) Get(ctx context.Context, id string) (*models.Category, error) {
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
+	loader := a.GetCategoryLoader(ctx)
+	cb, err := loader.Load(id)
 
-	objectId, _ := primitive.ObjectIDFromHex(id)
-
-	result := a.Database.Collection("category").FindOne(ctx, bson.M{
-		"_id": objectId,
-	})
-
-	var categoryDB models.CategoryDB
-	err := result.Decode(&categoryDB)
 	if err != nil {
 		return nil, err
 	}
 
+	// ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	// defer cancel()
+
+	// objectId, _ := primitive.ObjectIDFromHex(id)
+
+	// result := a.Database.Collection("category").FindOne(ctx, bson.M{
+	// 	"_id": objectId,
+	// })
+
+	// var categoryDB models.CategoryDB
+	// err = result.Decode(&categoryDB)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	// category := &models.Category{
+	// 	ID:   categoryDB.ID.Hex(),
+	// 	Name: categoryDB.Name,
+	// }
+
 	category := &models.Category{
-		ID:   categoryDB.ID.Hex(),
-		Name: categoryDB.Name,
+		ID:   cb.ID.Hex(),
+		Name: cb.Name,
 	}
 
 	return category, nil
@@ -58,13 +69,13 @@ func (a *api) Get(id string) (*models.Category, error) {
 
 // Get all categories.
 // if pagination is required then do else fetch all categories.
-func (a *api) GetAll(pagination *models.Pagination) ([]*models.Category, error) {
+func (a *api) GetAll(ctx context.Context, pagination *models.Pagination) ([]*models.Category, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	filter := bson.M{}
 
-	cursor, err := a.Database.Collection("category").Find(ctx, filter)
+	cursor, err := a.Database.Collection(a.DB_Collections.CATEGORY).Find(ctx, filter)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +99,7 @@ func (a *api) GetAll(pagination *models.Pagination) ([]*models.Category, error) 
 	return categories, nil
 }
 
-func (a *api) GetProductsByCategory(category *models.Category) ([]*models.Product, error) {
+func (a *api) GetProductsByCategory(ctx context.Context, category *models.Category) ([]*models.Product, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -98,7 +109,7 @@ func (a *api) GetProductsByCategory(category *models.Category) ([]*models.Produc
 
 	log.Println("Get Products By Category ", filter)
 
-	cursor, err := a.Database.Collection("products").Find(ctx, filter)
+	cursor, err := a.Database.Collection(a.DB_Collections.PRODUCTS).Find(ctx, filter)
 	if err != nil {
 		return nil, err
 	}

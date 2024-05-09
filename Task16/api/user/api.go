@@ -1,7 +1,8 @@
-package products
+package user
 
 import (
 	"context"
+	"graphql_search/graph/model"
 	"graphql_search/models"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -20,8 +21,7 @@ func New(database *mongo.Database, dbCollections *models.DB_COLLECTIONS) *api {
 }
 
 type Api interface {
-	// define interface methods
-	Create(ctx context.Context, name string, description string, price float64, quantity int, category string) (*models.Product, error)
-	GetAll(ctx context.Context, pagination *models.Pagination) ([]*models.Product, error)
-	Get(ctx context.Context, id string) (*models.Product, error)
+	RegisterUser(ctx context.Context, name string, emailID string, phoneNumber string, address model.AddressInput) (*model.User, error)
+	SignInUser(ctx context.Context, id string) (*model.User, error)
+	GetAllUsers(ctx context.Context, authToken string) ([]*model.User, error)
 }

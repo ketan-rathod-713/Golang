@@ -9,6 +9,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/gorilla/mux"
 )
 
 const defaultPort = "8080"
@@ -28,18 +29,24 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
+	mx := mux.NewRouter()
+
 	// static content
 	fileServerHandler := http.FileServer(http.Dir("public"))
-	http.Handle("/", fileServerHandler)
+	mx.Handle("/", fileServerHandler)
 
-	resolver := &graph.Resolver{Api: api.New(client, configs, dataCollections)}
+	api := api.New(client, configs, dataCollections)
+
+	resolver := &graph.Resolver{Api: api}
 
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: resolver}))
 
-	http.Handle("/playground", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", srv)
+	mx.Use(api.CategoryApi.CategoryLoaderMiddleware)
+
+	mx.Handle("/playground", playground.Handler("GraphQL playground", "/query"))
+	mx.Handle("/query", srv)
 
 	log.Printf("connect to http://localhost:%s/playground for GraphQL playground", configs.PORT)
 	log.Printf("connect to http://localhost:%s/ for Home Page", configs.PORT)
-	log.Fatal(http.ListenAndServe(":"+configs.PORT, nil))
+	log.Fatal(http.ListenAndServe(":"+configs.PORT, mx))
 }

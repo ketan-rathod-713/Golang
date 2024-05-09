@@ -1,0 +1,49 @@
+
+# User type
+type User {
+    ID: ID!
+    name: String!
+    emailId: String!
+    phoneNumber: String!
+    address: Address!
+    authToken: String
+    role: String!
+
+    # # resolver
+    # Cart: Cart!
+}
+
+# add fields like emailVerified or phonenumberverified like this.
+
+type Address {
+    street: String!
+    landmark: String!
+    city: String!
+    country: String!
+    zipCode: String!
+}
+
+input AddressInput {
+    street: String!
+    landmark: String!
+    city: String!
+    country: String!
+    zipCode: String!
+}
+
+# type Cart {
+#     # resolver
+#     User: User!
+#     Items: [CartItems!]!
+#     # find based on cart items prices.
+#     OrderValue: Int!
+# }
+
+# type CartItems {
+#     productId: String!
+#     qty: Int!
+#     subTotal: Int!
+
+#     # resolver.
+#     Product: Product!
+# }

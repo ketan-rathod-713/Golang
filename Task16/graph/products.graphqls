@@ -1,4 +1,4 @@
-
+#import "user.graphqls"
 
 type Product {
     Id: ID!
@@ -26,10 +26,16 @@ type Query {
 
     getCategories(Pagination: Pagination): [Category!]!
     getCategory(id: ID!): Category!
+
+    GetAllUsers(authToken: String!): [User!]!
 }
 
 type Mutation {
     CreateProduct(name: String!, description: String!, price: Float!, quantity: Int!, Category: ID!): Product!
 
     CreateCategory(name: String!): Category!
+
+    # give whole User with auth token
+    RegisterUser(name:String!, emailId:String!, phoneNumber:String!, address:AddressInput!): User!
+    SignInUser(ID: ID!): User!
 }

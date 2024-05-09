@@ -10,7 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func (a api) GetAll(pagination *models.Pagination) ([]*models.Product, error) {
+func (a api) GetAll(ctx context.Context, pagination *models.Pagination) ([]*models.Product, error) {
 	log.Println("Fetch All Products")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -18,7 +18,7 @@ func (a api) GetAll(pagination *models.Pagination) ([]*models.Product, error) {
 
 	var productsDB []*models.ProductDB
 
-	cursor, err := a.Database.Collection("products").Find(ctx, bson.M{})
+	cursor, err := a.Database.Collection(a.DB_Collections.PRODUCTS).Find(ctx, bson.M{})
 	if err != nil {
 		return nil, err
 	}
@@ -45,14 +45,14 @@ func (a api) GetAll(pagination *models.Pagination) ([]*models.Product, error) {
 	return products, nil
 }
 
-func (a *api) Get(id string) (*models.Product, error) {
+func (a *api) Get(ctx context.Context, id string) (*models.Product, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	objectId, _ := primitive.ObjectIDFromHex(id)
 
 	var productDB models.ProductDB
-	result := a.Database.Collection("products").FindOne(ctx, bson.M{
+	result := a.Database.Collection(a.DB_Collections.PRODUCTS).FindOne(ctx, bson.M{
 		"_id": objectId,
 	})
 
@@ -75,7 +75,7 @@ func (a *api) Get(id string) (*models.Product, error) {
 	return product, nil
 }
 
-func (a *api) Create(name string, description string, price float64, quantity int, category string) (*models.Product, error) {
+func (a *api) Create(ctx context.Context, name string, description string, price float64, quantity int, category string) (*models.Product, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -91,7 +91,7 @@ func (a *api) Create(name string, description string, price float64, quantity in
 
 	// ! why here unable to write price and quantity without double qoutes.
 
-	result, err := a.Database.Collection("products").InsertOne(ctx, bson.M{
+	result, err := a.Database.Collection(a.DB_Collections.PRODUCTS).InsertOne(ctx, bson.M{
 		"name":        name,
 		"description": description,
 		"price":       price,

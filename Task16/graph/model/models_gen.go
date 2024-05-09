@@ -2,8 +2,34 @@
 
 package model
 
+type Address struct {
+	Street   string `json:"street"`
+	Landmark string `json:"landmark"`
+	City     string `json:"city"`
+	Country  string `json:"country"`
+	ZipCode  string `json:"zipCode"`
+}
+
+type AddressInput struct {
+	Street   string `json:"street"`
+	Landmark string `json:"landmark"`
+	City     string `json:"city"`
+	Country  string `json:"country"`
+	ZipCode  string `json:"zipCode"`
+}
+
 type Mutation struct {
 }
 
 type Query struct {
+}
+
+type User struct {
+	ID          string   `json:"ID"`
+	Name        string   `json:"name"`
+	EmailID     string   `json:"emailId"`
+	PhoneNumber string   `json:"phoneNumber"`
+	Address     *Address `json:"address"`
+	AuthToken   *string  `json:"authToken,omitempty"`
+	Role        string   `json:"role"`
 }
