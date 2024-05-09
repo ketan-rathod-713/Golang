@@ -1,22 +1,49 @@
 # Eccommerce application using graphql
 
-- Products and categories crud
-    - fetch all products and their categories
-    - fetch all categories and different products in each of them.
-    - able to create product in respective category.
-    - rename category
-    - delete category with deleting all products
-    - delete category without deleting all products, only remove product from that category and put in others.
+- Product & Category Listing
 
-- Add to cart
-    - add to cart
-    - update user's cart.
-    - product details should be pointer to product.
+## Queries Examples
 
-- Place order
+```
+query example {
+  products: GetProducts{
+    Id,
+    Name, 
+    Description,
+    Price,
+    Quantity,
+    Category {
+      Id,
+      Name
+    }
+  },
+  categories : getCategories{
+    Id,
+    Name,
+    Products {
+      Id,
+      Name
+    }
+  }
+}
+```
 
-- Payment
+## Mutation Examples
 
-- Generate invoice
+```
+// create category
+mutation createCategory {
+  CreateCategory(name: "electronic-items"){
+    Id,
+    Name
+  }
+}
 
-- Think about discounts
+// create product
+mutation createProduct{
+  CreateProduct(name: "Notebook", price:500, quantity:10, description:"this is a product",Category: "663b89651f437c9bcf6d3862"){
+    Id,
+    Name
+  }
+}
+```

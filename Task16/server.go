@@ -14,7 +14,8 @@ import (
 const defaultPort = "8080"
 
 func main() {
-	configs, dbCollections, err := database.LoadEnv()
+
+	configs, dataCollections, err := database.LoadEnv()
 
 	// panics if unable to load environment variables
 	if err != nil {
@@ -27,12 +28,18 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
-	resolver := &graph.Resolver{Api: api.New(client, configs, dbCollections)}
+	// static content
+	fileServerHandler := http.FileServer(http.Dir("public"))
+	http.Handle("/", fileServerHandler)
+
+	resolver := &graph.Resolver{Api: api.New(client, configs, dataCollections)}
+
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: resolver}))
 
-	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	http.Handle("/playground", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", srv)
 
-	log.Printf("connect to http://localhost:%s/ for GraphQL playground", configs.PORT)
+	log.Printf("connect to http://localhost:%s/playground for GraphQL playground", configs.PORT)
+	log.Printf("connect to http://localhost:%s/ for Home Page", configs.PORT)
 	log.Fatal(http.ListenAndServe(":"+configs.PORT, nil))
 }

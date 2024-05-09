@@ -11,6 +11,7 @@ import (
 )
 
 func (a api) GetAll(pagination *models.Pagination) ([]*models.Product, error) {
+	log.Println("Fetch All Products")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()

@@ -31,6 +31,8 @@ func (a *api) Create(name string) (*models.Category, error) {
 }
 
 func (a *api) Get(id string) (*models.Category, error) {
+	log.Println("Fetch Category By Id")
+
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 

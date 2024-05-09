@@ -20,9 +20,9 @@ func New(client *mongo.Client, configs *models.Configs, dbCollections *models.DB
 	var db = client.Database(configs.DATABASE)
 
 	return &Api{
-		Client:  client,
-		Configs: configs,
+		Client:      client,
+		Configs:     configs,
 		CategoryApi: category.New(db, dbCollections),
-		ProductApi: products.New(db, dbCollections),
+		ProductApi:  products.New(db, dbCollections),
 	}
 }

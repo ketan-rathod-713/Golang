@@ -7,13 +7,14 @@ import (
 )
 
 type api struct {
-	Database *mongo.Database
-	DB_Co
+	Database       *mongo.Database
+	DB_Collections *models.DB_COLLECTIONS
 }
 
-func New(database *mongo.Database) *api {
+func New(database *mongo.Database, dbCollections *models.DB_COLLECTIONS) *api {
 	return &api{
-		Database: database,
+		Database:       database,
+		DB_Collections: dbCollections,
 	}
 }
 
