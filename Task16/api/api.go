@@ -15,14 +15,14 @@ type Api struct {
 	CategoryApi category.Api
 }
 
-func New(client *mongo.Client, configs *models.Configs) *Api {
+func New(client *mongo.Client, configs *models.Configs, dbCollections *models.DB_COLLECTIONS) *Api {
 
 	var db = client.Database(configs.DATABASE)
 
 	return &Api{
 		Client:  client,
 		Configs: configs,
-		CategoryApi: category.New(db),
-		ProductApi: products.New(db),
+		CategoryApi: category.New(db, dbCollections),
+		ProductApi: products.New(db, dbCollections),
 	}
 }

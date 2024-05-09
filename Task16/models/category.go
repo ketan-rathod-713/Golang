@@ -10,6 +10,6 @@ type Category struct {
 
 // database category model
 type CategoryDB struct {
-	ID primitive.ObjectID `bson:"_id"`
-	Name string
+	ID   primitive.ObjectID `bson:"_id"`
+	Name string             `bson:"name"`
 }

@@ -44,11 +44,40 @@ func (a api) GetAll(pagination *models.Pagination) ([]*models.Product, error) {
 	return products, nil
 }
 
-func (a *api) Get() {
+func (a *api) Get(id string) (*models.Product, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
+	objectId, _ := primitive.ObjectIDFromHex(id)
+
+	var productDB models.ProductDB
+	result := a.Database.Collection("products").FindOne(ctx, bson.M{
+		"_id": objectId,
+	})
+
+	err := result.Decode(&productDB)
+	if err != nil {
+		return nil, err
+	}
+
+	product := &models.Product{
+		ID:          productDB.Id.Hex(),
+		Name:        productDB.Name,
+		Description: productDB.Description,
+		Quantity:    productDB.Quantity,
+		Price:       productDB.Price,
+		Category: &models.Category{
+			ID: productDB.Category,
+		},
+	}
+
+	return product, nil
 }
 
 func (a *api) Create(name string, description string, price float64, quantity int, category string) (*models.Product, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
 	var product models.Product = models.Product{
 		Name:        name,
 		Description: description,
@@ -58,9 +87,8 @@ func (a *api) Create(name string, description string, price float64, quantity in
 			ID: category,
 		},
 	}
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
-	// ! why here unable to write price and quantity without doube qoutes.
+	// ! why here unable to write price and quantity without double qoutes.
 
 	result, err := a.Database.Collection("products").InsertOne(ctx, bson.M{
 		"name":        name,

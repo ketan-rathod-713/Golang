@@ -26,20 +26,27 @@ func Connect(config *models.Configs) (*mongo.Client, error) {
 }
 
 // Load environment variables
-func LoadEnv() (*models.Configs, error) {
+func LoadEnv() (*models.Configs, *models.DB_COLLECTIONS, error) {
 	godotenv.Load()
 
 	// Check if particular values are there in .env file, if not then generate an error.
 
 	configs := &models.Configs{
-		PORT:   os.Getenv("PORT"),
-		DB_URL: os.Getenv("DB_URL"),
+		PORT:     os.Getenv("PORT"),
+		DB_URL:   os.Getenv("DB_URL"),
 		DATABASE: os.Getenv("DATABASE"),
 	}
 
-	if configs.PORT == "" || configs.DB_URL == "" {
-		return nil, errors.New(".env file is not upto mark.")
+	dbCollections := &models.DB_COLLECTIONS{
+		CATEGORY: os.Getenv("COLL_CATEGORY"),
+		PRODUCTS: os.Getenv("COLL_PRODUCTS"),
+		CART:     os.Getenv("COLL_CARTS"),
+		ORDERS:   os.Getenv("COLL_ORDERS"),
 	}
 
-	return configs, nil
+	if configs.PORT == "" || configs.DB_URL == "" {
+		return nil, nil, errors.New(".env file is not upto mark.")
+	}
+
+	return configs, dbCollections, nil
 }

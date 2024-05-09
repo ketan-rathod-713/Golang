@@ -7,9 +7,11 @@
     - rename category
     - delete category with deleting all products
     - delete category without deleting all products, only remove product from that category and put in others.
-    - 
 
 - Add to cart
+    - add to cart
+    - update user's cart.
+    - product details should be pointer to product.
 
 - Place order
 

@@ -21,4 +21,5 @@ type Api interface {
 	Create(name string) (*models.Category, error)
 	Get(id string) (*models.Category, error)
 	GetAll(pagination *models.Pagination) ([]*models.Category, error)
+	GetProductsByCategory(category *models.Category) ([]*models.Product, error)
 }

@@ -76,8 +76,15 @@ autobind:
 models:
   Category:
     model: graphql_search/models.Category
+    fields:
+      Products:
+        resolver: true # Force a resolver to be generated.
+        # Can i generate my custom resolver without writting it here, whenever i require.
   Product:
     model: graphql_search/models.Product
+    fields:
+      Category:
+        resolver: true
   Pagination:
     model: graphql_search/models.Pagination
 

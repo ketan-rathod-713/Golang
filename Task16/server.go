@@ -14,7 +14,7 @@ import (
 const defaultPort = "8080"
 
 func main() {
-	configs, err := database.LoadEnv()
+	configs, dbCollections, err := database.LoadEnv()
 
 	// panics if unable to load environment variables
 	if err != nil {
@@ -27,7 +27,7 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
-	resolver := &graph.Resolver{Api: api.New(client, configs)}
+	resolver := &graph.Resolver{Api: api.New(client, configs, dbCollections)}
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: resolver}))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
