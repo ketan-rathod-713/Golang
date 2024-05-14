@@ -4,7 +4,7 @@ import "go.mongodb.org/mongo-driver/bson/primitive"
 
 type Category struct {
 	ID       string     `json:"Id" bson:"_id"`
-	Name     string     `json:"Name"`
+	Name     string     `json:"Name" bson:"name"`
 	Products []*Product `json:"Products" bson:"-"`
 }
 

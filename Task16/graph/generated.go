@@ -8,7 +8,6 @@ import (
 	"embed"
 	"errors"
 	"fmt"
-	"graphql_search/graph/model"
 	"graphql_search/models"
 	"strconv"
 	"sync"
@@ -67,7 +66,7 @@ type ComplexityRoot struct {
 	Mutation struct {
 		CreateCategory func(childComplexity int, name string) int
 		CreateProduct  func(childComplexity int, name string, description string, price float64, quantity int, category string) int
-		RegisterUser   func(childComplexity int, name string, emailID string, phoneNumber string, address model.AddressInput) int
+		RegisterUser   func(childComplexity int, name string, emailID string, phoneNumber string, address models.AddressInput) int
 		SignInUser     func(childComplexity int, id string) int
 	}
 
@@ -105,8 +104,8 @@ type CategoryResolver interface {
 type MutationResolver interface {
 	CreateProduct(ctx context.Context, name string, description string, price float64, quantity int, category string) (*models.Product, error)
 	CreateCategory(ctx context.Context, name string) (*models.Category, error)
-	RegisterUser(ctx context.Context, name string, emailID string, phoneNumber string, address model.AddressInput) (*model.User, error)
-	SignInUser(ctx context.Context, id string) (*model.User, error)
+	RegisterUser(ctx context.Context, name string, emailID string, phoneNumber string, address models.AddressInput) (*models.User, error)
+	SignInUser(ctx context.Context, id string) (*models.User, error)
 }
 type ProductResolver interface {
 	Category(ctx context.Context, obj *models.Product) (*models.Category, error)
@@ -116,7 +115,7 @@ type QueryResolver interface {
 	GetProduct(ctx context.Context, id string) (*models.Product, error)
 	GetCategories(ctx context.Context, pagination *models.Pagination) ([]*models.Category, error)
 	GetCategory(ctx context.Context, id string) (*models.Category, error)
-	GetAllUsers(ctx context.Context, authToken string) ([]*model.User, error)
+	GetAllUsers(ctx context.Context, authToken string) ([]*models.User, error)
 }
 
 type executableSchema struct {
@@ -228,7 +227,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.RegisterUser(childComplexity, args["name"].(string), args["emailId"].(string), args["phoneNumber"].(string), args["address"].(model.AddressInput)), true
+		return e.complexity.Mutation.RegisterUser(childComplexity, args["name"].(string), args["emailId"].(string), args["phoneNumber"].(string), args["address"].(models.AddressInput)), true
 
 	case "Mutation.SignInUser":
 		if e.complexity.Mutation.SignInUser == nil {
@@ -616,10 +615,10 @@ func (ec *executionContext) field_Mutation_RegisterUser_args(ctx context.Context
 		}
 	}
 	args["phoneNumber"] = arg2
-	var arg3 model.AddressInput
+	var arg3 models.AddressInput
 	if tmp, ok := rawArgs["address"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("address"))
-		arg3, err = ec.unmarshalNAddressInput2graphql_searchᚋgraphᚋmodelᚐAddressInput(ctx, tmp)
+		arg3, err = ec.unmarshalNAddressInput2graphql_searchᚋmodelsᚐAddressInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -771,7 +770,7 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
-func (ec *executionContext) _Address_street(ctx context.Context, field graphql.CollectedField, obj *model.Address) (ret graphql.Marshaler) {
+func (ec *executionContext) _Address_street(ctx context.Context, field graphql.CollectedField, obj *models.Address) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Address_street(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -815,7 +814,7 @@ func (ec *executionContext) fieldContext_Address_street(_ context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _Address_landmark(ctx context.Context, field graphql.CollectedField, obj *model.Address) (ret graphql.Marshaler) {
+func (ec *executionContext) _Address_landmark(ctx context.Context, field graphql.CollectedField, obj *models.Address) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Address_landmark(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -859,7 +858,7 @@ func (ec *executionContext) fieldContext_Address_landmark(_ context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _Address_city(ctx context.Context, field graphql.CollectedField, obj *model.Address) (ret graphql.Marshaler) {
+func (ec *executionContext) _Address_city(ctx context.Context, field graphql.CollectedField, obj *models.Address) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Address_city(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -903,7 +902,7 @@ func (ec *executionContext) fieldContext_Address_city(_ context.Context, field g
 	return fc, nil
 }
 
-func (ec *executionContext) _Address_country(ctx context.Context, field graphql.CollectedField, obj *model.Address) (ret graphql.Marshaler) {
+func (ec *executionContext) _Address_country(ctx context.Context, field graphql.CollectedField, obj *models.Address) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Address_country(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -947,7 +946,7 @@ func (ec *executionContext) fieldContext_Address_country(_ context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _Address_zipCode(ctx context.Context, field graphql.CollectedField, obj *model.Address) (ret graphql.Marshaler) {
+func (ec *executionContext) _Address_zipCode(ctx context.Context, field graphql.CollectedField, obj *models.Address) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Address_zipCode(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -1283,7 +1282,7 @@ func (ec *executionContext) _Mutation_RegisterUser(ctx context.Context, field gr
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().RegisterUser(rctx, fc.Args["name"].(string), fc.Args["emailId"].(string), fc.Args["phoneNumber"].(string), fc.Args["address"].(model.AddressInput))
+		return ec.resolvers.Mutation().RegisterUser(rctx, fc.Args["name"].(string), fc.Args["emailId"].(string), fc.Args["phoneNumber"].(string), fc.Args["address"].(models.AddressInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1295,9 +1294,9 @@ func (ec *executionContext) _Mutation_RegisterUser(ctx context.Context, field gr
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.User)
+	res := resTmp.(*models.User)
 	fc.Result = res
-	return ec.marshalNUser2ᚖgraphql_searchᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚖgraphql_searchᚋmodelsᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_RegisterUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1366,9 +1365,9 @@ func (ec *executionContext) _Mutation_SignInUser(ctx context.Context, field grap
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.User)
+	res := resTmp.(*models.User)
 	fc.Result = res
-	return ec.marshalNUser2ᚖgraphql_searchᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚖgraphql_searchᚋmodelsᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_SignInUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1973,9 +1972,9 @@ func (ec *executionContext) _Query_GetAllUsers(ctx context.Context, field graphq
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.User)
+	res := resTmp.([]*models.User)
 	fc.Result = res
-	return ec.marshalNUser2ᚕᚖgraphql_searchᚋgraphᚋmodelᚐUserᚄ(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚕᚖgraphql_searchᚋmodelsᚐUserᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_GetAllUsers(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2147,7 +2146,7 @@ func (ec *executionContext) fieldContext_Query___schema(_ context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _User_ID(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_ID(ctx context.Context, field graphql.CollectedField, obj *models.User) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_User_ID(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -2191,7 +2190,7 @@ func (ec *executionContext) fieldContext_User_ID(_ context.Context, field graphq
 	return fc, nil
 }
 
-func (ec *executionContext) _User_name(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_name(ctx context.Context, field graphql.CollectedField, obj *models.User) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_User_name(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -2235,7 +2234,7 @@ func (ec *executionContext) fieldContext_User_name(_ context.Context, field grap
 	return fc, nil
 }
 
-func (ec *executionContext) _User_emailId(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_emailId(ctx context.Context, field graphql.CollectedField, obj *models.User) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_User_emailId(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -2279,7 +2278,7 @@ func (ec *executionContext) fieldContext_User_emailId(_ context.Context, field g
 	return fc, nil
 }
 
-func (ec *executionContext) _User_phoneNumber(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_phoneNumber(ctx context.Context, field graphql.CollectedField, obj *models.User) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_User_phoneNumber(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -2323,7 +2322,7 @@ func (ec *executionContext) fieldContext_User_phoneNumber(_ context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _User_address(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_address(ctx context.Context, field graphql.CollectedField, obj *models.User) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_User_address(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -2349,9 +2348,9 @@ func (ec *executionContext) _User_address(ctx context.Context, field graphql.Col
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Address)
+	res := resTmp.(*models.Address)
 	fc.Result = res
-	return ec.marshalNAddress2ᚖgraphql_searchᚋgraphᚋmodelᚐAddress(ctx, field.Selections, res)
+	return ec.marshalNAddress2ᚖgraphql_searchᚋmodelsᚐAddress(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_User_address(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2379,7 +2378,7 @@ func (ec *executionContext) fieldContext_User_address(_ context.Context, field g
 	return fc, nil
 }
 
-func (ec *executionContext) _User_authToken(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_authToken(ctx context.Context, field graphql.CollectedField, obj *models.User) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_User_authToken(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -2420,7 +2419,7 @@ func (ec *executionContext) fieldContext_User_authToken(_ context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _User_role(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_role(ctx context.Context, field graphql.CollectedField, obj *models.User) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_User_role(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -4237,8 +4236,8 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(_ context.Context
 
 // region    **************************** input.gotpl *****************************
 
-func (ec *executionContext) unmarshalInputAddressInput(ctx context.Context, obj interface{}) (model.AddressInput, error) {
-	var it model.AddressInput
+func (ec *executionContext) unmarshalInputAddressInput(ctx context.Context, obj interface{}) (models.AddressInput, error) {
+	var it models.AddressInput
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
@@ -4336,7 +4335,7 @@ func (ec *executionContext) unmarshalInputPagination(ctx context.Context, obj in
 
 var addressImplementors = []string{"Address"}
 
-func (ec *executionContext) _Address(ctx context.Context, sel ast.SelectionSet, obj *model.Address) graphql.Marshaler {
+func (ec *executionContext) _Address(ctx context.Context, sel ast.SelectionSet, obj *models.Address) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, addressImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -4800,7 +4799,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 
 var userImplementors = []string{"User"}
 
-func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj *model.User) graphql.Marshaler {
+func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj *models.User) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, userImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -5190,7 +5189,7 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
-func (ec *executionContext) marshalNAddress2ᚖgraphql_searchᚋgraphᚋmodelᚐAddress(ctx context.Context, sel ast.SelectionSet, v *model.Address) graphql.Marshaler {
+func (ec *executionContext) marshalNAddress2ᚖgraphql_searchᚋmodelsᚐAddress(ctx context.Context, sel ast.SelectionSet, v *models.Address) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -5200,7 +5199,7 @@ func (ec *executionContext) marshalNAddress2ᚖgraphql_searchᚋgraphᚋmodelᚐ
 	return ec._Address(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNAddressInput2graphql_searchᚋgraphᚋmodelᚐAddressInput(ctx context.Context, v interface{}) (model.AddressInput, error) {
+func (ec *executionContext) unmarshalNAddressInput2graphql_searchᚋmodelsᚐAddressInput(ctx context.Context, v interface{}) (models.AddressInput, error) {
 	res, err := ec.unmarshalInputAddressInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -5396,11 +5395,11 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 	return res
 }
 
-func (ec *executionContext) marshalNUser2graphql_searchᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v model.User) graphql.Marshaler {
+func (ec *executionContext) marshalNUser2graphql_searchᚋmodelsᚐUser(ctx context.Context, sel ast.SelectionSet, v models.User) graphql.Marshaler {
 	return ec._User(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNUser2ᚕᚖgraphql_searchᚋgraphᚋmodelᚐUserᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.User) graphql.Marshaler {
+func (ec *executionContext) marshalNUser2ᚕᚖgraphql_searchᚋmodelsᚐUserᚄ(ctx context.Context, sel ast.SelectionSet, v []*models.User) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -5424,7 +5423,7 @@ func (ec *executionContext) marshalNUser2ᚕᚖgraphql_searchᚋgraphᚋmodelᚐ
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNUser2ᚖgraphql_searchᚋgraphᚋmodelᚐUser(ctx, sel, v[i])
+			ret[i] = ec.marshalNUser2ᚖgraphql_searchᚋmodelsᚐUser(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -5444,7 +5443,7 @@ func (ec *executionContext) marshalNUser2ᚕᚖgraphql_searchᚋgraphᚋmodelᚐ
 	return ret
 }
 
-func (ec *executionContext) marshalNUser2ᚖgraphql_searchᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v *model.User) graphql.Marshaler {
+func (ec *executionContext) marshalNUser2ᚖgraphql_searchᚋmodelsᚐUser(ctx context.Context, sel ast.SelectionSet, v *models.User) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")

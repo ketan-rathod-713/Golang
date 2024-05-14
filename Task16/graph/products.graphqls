@@ -9,6 +9,11 @@ type Product {
     Category: Category!
 }
 
+# TODO: New Discount requirement
+# 1. Able to add discounts in festive season with particular code or badge ( diwali sale etc. )
+# 2. Discount should be deleted after specified time and no badge should be displayed.
+# 3. Calculate price of cart and all this based on discounts only.
+
 type Category {
     Id: ID!
     Name: String!

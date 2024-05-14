@@ -15,22 +15,20 @@ import (
 const defaultPort = "8080"
 
 func main() {
-
 	configs, dataCollections, err := database.LoadEnv()
-
 	// panics if unable to load environment variables
 	if err != nil {
 		log.Fatal(err.Error())
 	}
+	log.Println("Environment variables loaded.")
 
 	client, err := database.Connect(configs)
-
 	if err != nil {
 		log.Fatal(err.Error())
 	}
+	log.Println("Mongodb database connected.")
 
 	mx := mux.NewRouter()
-
 	// static content
 	fileServerHandler := http.FileServer(http.Dir("public"))
 	mx.Handle("/", fileServerHandler)
@@ -38,7 +36,6 @@ func main() {
 	api := api.New(client, configs, dataCollections)
 
 	resolver := &graph.Resolver{Api: api}
-
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: resolver}))
 
 	mx.Use(api.CategoryApi.CategoryLoaderMiddleware)

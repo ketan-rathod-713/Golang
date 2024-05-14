@@ -85,6 +85,12 @@ models:
     fields:
       Category:
         resolver: true
+  Address:
+    model: graphql_search/models.Address
+  AddressInput:
+    model: graphql_search/models.AddressInput
+  User:
+    model: graphql_search/models.User
   Pagination:
     model: graphql_search/models.Pagination
 

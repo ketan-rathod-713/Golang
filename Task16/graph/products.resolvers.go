@@ -7,7 +7,6 @@ package graph
 import (
 	"context"
 	"fmt"
-	"graphql_search/graph/model"
 	"graphql_search/models"
 )
 
@@ -28,12 +27,12 @@ func (r *mutationResolver) CreateCategory(ctx context.Context, name string) (*mo
 }
 
 // RegisterUser is the resolver for the RegisterUser field.
-func (r *mutationResolver) RegisterUser(ctx context.Context, name string, emailID string, phoneNumber string, address model.AddressInput) (*model.User, error) {
-	return r.Api.UserApi.RegisterUser(ctx, name, emailID, phoneNumber, address)
+func (r *mutationResolver) RegisterUser(ctx context.Context, name string, emailID string, phoneNumber string, address models.AddressInput) (*models.User, error) {
+	return nil, nil
 }
 
 // SignInUser is the resolver for the SignInUser field.
-func (r *mutationResolver) SignInUser(ctx context.Context, id string) (*model.User, error) {
+func (r *mutationResolver) SignInUser(ctx context.Context, id string) (*models.User, error) {
 	panic(fmt.Errorf("not implemented: SignInUser - SignInUser"))
 }
 
@@ -64,8 +63,8 @@ func (r *queryResolver) GetCategory(ctx context.Context, id string) (*models.Cat
 }
 
 // GetAllUsers is the resolver for the GetAllUsers field.
-func (r *queryResolver) GetAllUsers(ctx context.Context, authToken string) ([]*model.User, error) {
-	return r.Api.UserApi.GetAllUsers(ctx, authToken)
+func (r *queryResolver) GetAllUsers(ctx context.Context, authToken string) ([]*models.User, error) {
+	return nil, nil
 }
 
 // Category returns CategoryResolver implementation.

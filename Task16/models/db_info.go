@@ -5,4 +5,6 @@ type DB_COLLECTIONS struct {
 	PRODUCTS string
 	CART     string
 	ORDERS   string
+	USERS    string
+	LOGS     string
 }

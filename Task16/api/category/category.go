@@ -2,7 +2,9 @@ package category
 
 import (
 	"context"
+	"fmt"
 	"graphql_search/models"
+	"graphql_search/service/logs"
 	"log"
 	"time"
 
@@ -27,6 +29,13 @@ func (a *api) Create(ctx context.Context, name string) (*models.Category, error)
 	category.ID = result.InsertedID.(primitive.ObjectID).Hex()
 
 	log.Println("Category Inserted ", category.ID)
+
+	lg := logs.New(a.Database, *a.DB_Collections)
+	err = lg.LogInformationToDB(&logs.LogData{Type: "CATEGORY_CREATED", Information: fmt.Sprintf("CATEGORY ID:%v", category.ID), Prioririty: "COMMON_LOGS", CreatedAt: time.Now().String()})
+	if err != nil {
+		log.Println("ERROR LOGGING")
+	}
+
 	return &category, nil
 }
 

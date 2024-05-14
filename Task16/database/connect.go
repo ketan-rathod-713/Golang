@@ -42,6 +42,8 @@ func LoadEnv() (*models.Configs, *models.DB_COLLECTIONS, error) {
 		PRODUCTS: os.Getenv("COLL_PRODUCTS"),
 		CART:     os.Getenv("COLL_CARTS"),
 		ORDERS:   os.Getenv("COLL_ORDERS"),
+		USERS: os.Getenv("COLL_USERS"),
+		LOGS: os.Getenv("COLL_LOGS"),
 	}
 
 	if configs.PORT == "" || configs.DB_URL == "" {
