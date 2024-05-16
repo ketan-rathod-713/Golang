@@ -6,7 +6,7 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-func validateSignupRequest(user *models.User, validate *validator.Validate) []validator.FieldError {
+func validateSignupRequest(user *models.UserDB, validate *validator.Validate) []validator.FieldError {
 	var errs = make([]validator.FieldError, 0)
 
 	err := validate.Struct(user)

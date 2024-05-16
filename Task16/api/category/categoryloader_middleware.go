@@ -4,7 +4,6 @@ import (
 	"context"
 	ers "errors"
 	"graphql_search/models"
-	"log"
 	"net/http"
 	"time"
 
@@ -19,7 +18,7 @@ func (a *api) CategoryLoaderMiddleware(next http.Handler) http.Handler {
 			Wait:     2 * time.Millisecond,
 			MaxBatch: 100,
 			Fetch: func(keys []string) ([]models.CategoryDB, []error) {
-				log.Println("Fetch Categories called for keys", keys)
+				// log.Println("Fetch Categories called for keys", keys)
 
 				// data we need to populate.
 				categories := make([]models.CategoryDB, len(keys))
@@ -56,7 +55,7 @@ func (a *api) CategoryLoaderMiddleware(next http.Handler) http.Handler {
 					return categories, errors
 				}
 
-				log.Println("Categories got for given keys ", categoriesGot)
+				// log.Println("Categories got for given keys ", categoriesGot)
 
 				// iterate categories got and return exact sequence of data we got in keys
 				var mp map[string]models.CategoryDB = make(map[string]models.CategoryDB)

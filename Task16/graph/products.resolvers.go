@@ -7,6 +7,7 @@ package graph
 import (
 	"context"
 	"fmt"
+	"graphql_search/graph/model"
 	"graphql_search/models"
 )
 
@@ -17,23 +18,43 @@ func (r *categoryResolver) Products(ctx context.Context, obj *models.Category) (
 }
 
 // CreateProduct is the resolver for the CreateProduct field.
-func (r *mutationResolver) CreateProduct(ctx context.Context, name string, description string, price float64, quantity int, category string) (*models.Product, error) {
+func (r *mutationResolver) CreateProduct(ctx context.Context, name string, description string, price float64, quantity int, category string, authToken string) (*models.Product, error) {
 	return r.Api.ProductApi.Create(ctx, name, description, price, quantity, category)
 }
 
 // CreateCategory is the resolver for the CreateCategory field.
-func (r *mutationResolver) CreateCategory(ctx context.Context, name string) (*models.Category, error) {
+func (r *mutationResolver) CreateCategory(ctx context.Context, name string, authToken string) (*models.Category, error) {
 	return r.Api.CategoryApi.Create(ctx, name)
 }
 
-// RegisterUser is the resolver for the RegisterUser field.
-func (r *mutationResolver) RegisterUser(ctx context.Context, name string, emailID string, phoneNumber string, address models.AddressInput) (*models.User, error) {
-	return nil, nil
+// UpdateProduct is the resolver for the UpdateProduct field.
+func (r *mutationResolver) UpdateProduct(ctx context.Context, id string, product model.UpdateProduct, authToken string) (*models.Product, error) {
+	panic(fmt.Errorf("not implemented: UpdateProduct - UpdateProduct"))
 }
 
-// SignInUser is the resolver for the SignInUser field.
-func (r *mutationResolver) SignInUser(ctx context.Context, id string) (*models.User, error) {
-	panic(fmt.Errorf("not implemented: SignInUser - SignInUser"))
+// UpdateCategory is the resolver for the UpdateCategory field.
+func (r *mutationResolver) UpdateCategory(ctx context.Context, id string, category model.UpdateCategory, authToken string) (*models.Category, error) {
+	panic(fmt.Errorf("not implemented: UpdateCategory - UpdateCategory"))
+}
+
+// RegisterUser is the resolver for the RegisterUser field.
+func (r *mutationResolver) RegisterUser(ctx context.Context, user model.RegisterUser) (*models.User, error) {
+	return r.Api.UserApi.RegisterUser(ctx, user)
+}
+
+// SignInUserByEmail is the resolver for the SignInUserByEmail field.
+func (r *mutationResolver) SignInUserByEmail(ctx context.Context, user model.SignInUserByEmail) (*models.User, error) {
+	return r.Api.UserApi.SignInUserByEmail(ctx, user)
+}
+
+// SignInUserByOtp is the resolver for the SignInUserByOTP field.
+func (r *mutationResolver) SignInUserByOtp(ctx context.Context, user model.SignInUserByOtp) (*models.User, error) {
+	panic(fmt.Errorf("not implemented: SignInUserByOtp - SignInUserByOTP"))
+}
+
+// VerifyUserEmail is the resolver for the VerifyUserEmail field.
+func (r *mutationResolver) VerifyUserEmail(ctx context.Context, authToken string) (*models.User, error) {
+	return r.Api.UserApi.VerifyUserEmail(ctx, authToken)
 }
 
 // Category is the resolver for the Category field.
@@ -65,6 +86,11 @@ func (r *queryResolver) GetCategory(ctx context.Context, id string) (*models.Cat
 // GetAllUsers is the resolver for the GetAllUsers field.
 func (r *queryResolver) GetAllUsers(ctx context.Context, authToken string) ([]*models.User, error) {
 	return nil, nil
+}
+
+// GetUser is the resolver for the GetUser field.
+func (r *queryResolver) GetUser(ctx context.Context, authToken string) (*models.User, error) {
+	return r.Api.UserApi.GetUser(ctx, authToken)
 }
 
 // Category returns CategoryResolver implementation.

@@ -1,8 +1,6 @@
-package auth
+package models
 
 import (
-	"time"
-
 	"github.com/golang-jwt/jwt/v5"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -14,9 +12,4 @@ type UserClaims struct {
 	Name     string             `json:"name"`
 	Role     string             `json:"role"`
 	jwt.RegisteredClaims
-}
-
-type JWTToken struct {
-	Value     string
-	ExpiresAt time.Time
 }

@@ -32,9 +32,13 @@ func LoadEnv() (*models.Configs, *models.DB_COLLECTIONS, error) {
 	// Check if particular values are there in .env file, if not then generate an error.
 
 	configs := &models.Configs{
-		PORT:     os.Getenv("PORT"),
-		DB_URL:   os.Getenv("DB_URL"),
-		DATABASE: os.Getenv("DATABASE"),
+		PORT:          os.Getenv("PORT"),
+		HOST:          os.Getenv("HOST"),
+		DB_URL:        os.Getenv("DB_URL"),
+		DATABASE:      os.Getenv("DATABASE"),
+		JWT_SECRET:    os.Getenv("JWT_SECRET"),
+		SMTP_PASSWORD: os.Getenv("SMTP_PASSWORD"),
+		SMTP_EMAIL:    os.Getenv("SMTP_EMAIL"),
 	}
 
 	dbCollections := &models.DB_COLLECTIONS{
@@ -42,8 +46,8 @@ func LoadEnv() (*models.Configs, *models.DB_COLLECTIONS, error) {
 		PRODUCTS: os.Getenv("COLL_PRODUCTS"),
 		CART:     os.Getenv("COLL_CARTS"),
 		ORDERS:   os.Getenv("COLL_ORDERS"),
-		USERS: os.Getenv("COLL_USERS"),
-		LOGS: os.Getenv("COLL_LOGS"),
+		USERS:    os.Getenv("COLL_USERS"),
+		LOGS:     os.Getenv("COLL_LOGS"),
 	}
 
 	if configs.PORT == "" || configs.DB_URL == "" {

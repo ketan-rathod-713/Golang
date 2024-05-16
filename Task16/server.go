@@ -4,6 +4,7 @@ import (
 	"graphql_search/api"
 	"graphql_search/database"
 	"graphql_search/graph"
+	"graphql_search/service/cashe"
 	"log"
 	"net/http"
 
@@ -28,12 +29,21 @@ func main() {
 	}
 	log.Println("Mongodb database connected.")
 
+	redisClient, err := cashe.Init("", "", 0, "localhost:6379")
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	log.Println("Redis database connected.")
+
 	mx := mux.NewRouter()
+
+	api := api.New(client, configs, dataCollections, redisClient)
+	api.InitializeRoutes(mx)
+
 	// static content
 	fileServerHandler := http.FileServer(http.Dir("public"))
 	mx.Handle("/", fileServerHandler)
-
-	api := api.New(client, configs, dataCollections)
 
 	resolver := &graph.Resolver{Api: api}
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: resolver}))

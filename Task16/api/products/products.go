@@ -51,6 +51,24 @@ func (a *api) Get(ctx context.Context, id string) (*models.Product, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
+	// check if given product is in redis if it is then return it.
+	productCashed, err := a.RedisProductService.Get(id)
+
+	// if found product then return it.
+	if err == nil {
+		product := &models.Product{
+			ID:          productCashed.Id.Hex(),
+			Name:        productCashed.Name,
+			Description: productCashed.Description,
+			Quantity:    productCashed.Quantity,
+			Price:       productCashed.Price,
+			Status:      productCashed.Status,
+			Category: &models.Category{
+				ID: productCashed.Category,
+			}}
+		return product, nil
+	}
+
 	objectId, _ := primitive.ObjectIDFromHex(id)
 
 	var productDB models.ProductDB
@@ -58,7 +76,7 @@ func (a *api) Get(ctx context.Context, id string) (*models.Product, error) {
 		"_id": objectId,
 	})
 
-	err := result.Decode(&productDB)
+	err = result.Decode(&productDB)
 	if err != nil {
 		return nil, err
 	}
@@ -72,6 +90,12 @@ func (a *api) Get(ctx context.Context, id string) (*models.Product, error) {
 		Category: &models.Category{
 			ID: productDB.Category,
 		},
+	}
+
+	// Save data to redis cashe
+	err = a.RedisProductService.Set(&productDB)
+	if err != nil {
+		log.Println("error :", err)
 	}
 
 	return product, nil

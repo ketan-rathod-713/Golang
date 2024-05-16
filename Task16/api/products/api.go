@@ -3,19 +3,23 @@ package products
 import (
 	"context"
 	"graphql_search/models"
+	"graphql_search/service/cashe"
+	"graphql_search/service/cashe/product"
 
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type api struct {
-	Database       *mongo.Database
-	DB_Collections *models.DB_COLLECTIONS
+	Database            *mongo.Database
+	DB_Collections      *models.DB_COLLECTIONS
+	RedisProductService product.Service
 }
 
-func New(database *mongo.Database, dbCollections *models.DB_COLLECTIONS) *api {
+func New(database *mongo.Database, dbCollections *models.DB_COLLECTIONS, redisService *cashe.Service) *api {
 	return &api{
-		Database:       database,
-		DB_Collections: dbCollections,
+		Database:            database,
+		DB_Collections:      dbCollections,
+		RedisProductService: redisService.Product,
 	}
 }
 
@@ -27,5 +31,5 @@ type Api interface {
 	GetAll(ctx context.Context, pagination *models.Pagination) ([]*models.Product, error)
 	Get(ctx context.Context, id string) (*models.Product, error)
 
-	// UpdateProduct() // update qty, name, price, status, 
+	// UpdateProduct() // update qty, name, price, status,
 }

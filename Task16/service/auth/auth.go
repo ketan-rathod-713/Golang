@@ -2,7 +2,6 @@ package auth
 
 import (
 	"errors"
-	"fmt"
 	"graphql_search/models"
 	"time"
 
@@ -10,24 +9,23 @@ import (
 )
 
 // generate jwt token for user
-func (s *service) GenerateJwtToken(user *UserClaims, config *models.Configs) (string, error) {
-	// map claims are the extra data that we want to store
-	fmt.Println("Generating jwt token for object id", user.ObjectId)
-	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, UserClaims{
+func (s *service) GenerateJwtToken(user *models.UserClaims) (string, error) {
+
+	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, models.UserClaims{
 		ObjectId: user.ObjectId,
 		EmailId:  user.EmailId,
 		Name:     user.Name,
 		Role:     user.Role,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: &jwt.NumericDate{Time: time.Now().Add(time.Minute * 5)},
+			ExpiresAt: &jwt.NumericDate{Time: time.Now().Add(s.ExpireTime)},
 			IssuedAt: &jwt.NumericDate{
 				Time: time.Now(),
 			},
 		},
 	})
 
-	var secretByte = []byte(config.JWT_SECRET)
-	// Sign and get the complete encoded token as a string using the secret
+	var secretByte = []byte(s.JwtSecret)
+
 	tokenString, err := jwtToken.SignedString(secretByte)
 
 	if err != nil {
@@ -38,16 +36,16 @@ func (s *service) GenerateJwtToken(user *UserClaims, config *models.Configs) (st
 }
 
 // verify jwt and return its claims and error if any
-func (s *service) VerifyJwt(jwtToken string, config *models.Config) (*UserClaims, error) {
+func (s *service) VerifyJwt(jwtToken string) (*models.UserClaims, error) {
 
-	var claims UserClaims
+	var claims models.UserClaims
 	token, err := jwt.ParseWithClaims(jwtToken, &claims, func(t *jwt.Token) (interface{}, error) {
-		return []byte(config.SECRET), nil
+		return []byte(s.JwtSecret), nil
 	})
 
 	if err != nil {
 		return nil, err
-	} else if claims, ok := token.Claims.(*UserClaims); ok {
+	} else if claims, ok := token.Claims.(*models.UserClaims); ok {
 		return claims, nil
 	} else {
 		return nil, errors.New("unknown claims type, cannot proceed")

@@ -2,8 +2,42 @@
 
 package model
 
+import (
+	"graphql_search/models"
+)
+
 type Mutation struct {
 }
 
 type Query struct {
+}
+
+type RegisterUser struct {
+	Name        string               `json:"name"`
+	EmailID     string               `json:"emailId"`
+	PhoneNumber string               `json:"phoneNumber"`
+	Address     *models.AddressInput `json:"address"`
+	Password    string               `json:"password"`
+}
+
+type SignInUserByEmail struct {
+	EmailID  string `json:"emailId"`
+	Password string `json:"password"`
+}
+
+type SignInUserByOtp struct {
+	PhoneNumber     string `json:"phoneNumber"`
+	OneTimePassword string `json:"oneTimePassword"`
+}
+
+type UpdateCategory struct {
+	Name *string `json:"name,omitempty"`
+}
+
+type UpdateProduct struct {
+	Name        *string  `json:"name,omitempty"`
+	Description *string  `json:"description,omitempty"`
+	Quantity    *int     `json:"quantity,omitempty"`
+	Price       *float64 `json:"price,omitempty"`
+	CategoryID  *string  `json:"categoryId,omitempty"`
 }

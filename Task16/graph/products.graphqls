@@ -29,18 +29,55 @@ type Query {
     GetProducts(Pagination: Pagination): [Product!]!
     GetProduct(id: ID!): Product!
 
-    getCategories(Pagination: Pagination): [Category!]!
+    getCategories(Pagination: Pagination): [Category]!
     getCategory(id: ID!): Category!
 
+    # authenticated routes
     GetAllUsers(authToken: String!): [User!]!
+    GetUser(authToken: String!): User!
+}
+
+input UpdateProduct {
+    name: String 
+    description: String 
+    quantity: Int
+    price:  Float
+    categoryId: String
+}
+
+input UpdateCategory {
+    name: String
+}
+
+input RegisterUser {
+    name: String! 
+    emailId: String!
+    phoneNumber: String!
+    address: AddressInput!
+    password: String!
+}
+
+# take either email id or password.
+input SignInUserByEmail {
+    emailId: String!
+    password: String!
+}
+
+input SignInUserByOTP {
+    phoneNumber: String!
+    oneTimePassword: String!
 }
 
 type Mutation {
-    CreateProduct(name: String!, description: String!, price: Float!, quantity: Int!, Category: ID!): Product!
-
-    CreateCategory(name: String!): Category!
+    # admin only
+    CreateProduct(name: String!, description: String!, price: Float!, quantity: Int!, Category: ID!, authToken: String!): Product!
+    CreateCategory(name: String!, authToken: String!): Category!
+    UpdateProduct(id: ID!, product: UpdateProduct!, authToken: String!):Product!
+    UpdateCategory(id: ID!, category: UpdateCategory!, authToken: String!):Category!
 
     # give whole User with auth token
-    RegisterUser(name:String!, emailId:String!, phoneNumber:String!, address:AddressInput!): User!
-    SignInUser(ID: ID!): User!
+    RegisterUser(user: RegisterUser!): User!
+    SignInUserByEmail(user: SignInUserByEmail!): User!
+    SignInUserByOTP(user: SignInUserByOTP!): User!
+    VerifyUserEmail(authToken: String!): User!
 }

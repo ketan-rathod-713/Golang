@@ -16,7 +16,6 @@ func (a *api) Create(ctx context.Context, name string) (*models.Category, error)
 	var category models.Category = models.Category{
 		Name: name,
 	}
-	// ctx, _ := context.WithTimeout(context.Background(), 2*time.Second)
 
 	result, err := a.Database.Collection(a.DB_Collections.CATEGORY).InsertOne(ctx, bson.M{
 		"name": name,
@@ -41,6 +40,17 @@ func (a *api) Create(ctx context.Context, name string) (*models.Category, error)
 
 func (a *api) Get(ctx context.Context, id string) (*models.Category, error) {
 
+	// check if category stored in cashe
+	categoryDB, err := a.RedisCategoryService.Get(id)
+	if err == nil {
+		category := &models.Category{
+			ID:   categoryDB.ID.Hex(),
+			Name: categoryDB.Name,
+		}
+
+		return category, nil
+	}
+
 	loader := a.GetCategoryLoader(ctx)
 	cb, err := loader.Load(id)
 
@@ -48,29 +58,15 @@ func (a *api) Get(ctx context.Context, id string) (*models.Category, error) {
 		return nil, err
 	}
 
-	// ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	// defer cancel()
-
-	// objectId, _ := primitive.ObjectIDFromHex(id)
-
-	// result := a.Database.Collection("category").FindOne(ctx, bson.M{
-	// 	"_id": objectId,
-	// })
-
-	// var categoryDB models.CategoryDB
-	// err = result.Decode(&categoryDB)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// category := &models.Category{
-	// 	ID:   categoryDB.ID.Hex(),
-	// 	Name: categoryDB.Name,
-	// }
-
 	category := &models.Category{
 		ID:   cb.ID.Hex(),
 		Name: cb.Name,
+	}
+
+	// Save data to redis cashe
+	err = a.RedisCategoryService.Set(&cb)
+	if err != nil {
+		log.Println("error :", err)
 	}
 
 	return category, nil

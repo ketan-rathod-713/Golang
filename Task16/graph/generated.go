@@ -8,6 +8,7 @@ import (
 	"embed"
 	"errors"
 	"fmt"
+	"graphql_search/graph/model"
 	"graphql_search/models"
 	"strconv"
 	"sync"
@@ -64,10 +65,14 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateCategory func(childComplexity int, name string) int
-		CreateProduct  func(childComplexity int, name string, description string, price float64, quantity int, category string) int
-		RegisterUser   func(childComplexity int, name string, emailID string, phoneNumber string, address models.AddressInput) int
-		SignInUser     func(childComplexity int, id string) int
+		CreateCategory    func(childComplexity int, name string, authToken string) int
+		CreateProduct     func(childComplexity int, name string, description string, price float64, quantity int, category string, authToken string) int
+		RegisterUser      func(childComplexity int, user model.RegisterUser) int
+		SignInUserByEmail func(childComplexity int, user model.SignInUserByEmail) int
+		SignInUserByOtp   func(childComplexity int, user model.SignInUserByOtp) int
+		UpdateCategory    func(childComplexity int, id string, category model.UpdateCategory, authToken string) int
+		UpdateProduct     func(childComplexity int, id string, product model.UpdateProduct, authToken string) int
+		VerifyUserEmail   func(childComplexity int, authToken string) int
 	}
 
 	Product struct {
@@ -85,16 +90,19 @@ type ComplexityRoot struct {
 		GetCategory   func(childComplexity int, id string) int
 		GetProduct    func(childComplexity int, id string) int
 		GetProducts   func(childComplexity int, pagination *models.Pagination) int
+		GetUser       func(childComplexity int, authToken string) int
 	}
 
 	User struct {
-		Address     func(childComplexity int) int
-		AuthToken   func(childComplexity int) int
-		EmailID     func(childComplexity int) int
-		ID          func(childComplexity int) int
-		Name        func(childComplexity int) int
-		PhoneNumber func(childComplexity int) int
-		Role        func(childComplexity int) int
+		Address         func(childComplexity int) int
+		AuthToken       func(childComplexity int) int
+		EmailID         func(childComplexity int) int
+		ID              func(childComplexity int) int
+		IsEmailVerified func(childComplexity int) int
+		IsPhoneVerified func(childComplexity int) int
+		Name            func(childComplexity int) int
+		PhoneNumber     func(childComplexity int) int
+		Role            func(childComplexity int) int
 	}
 }
 
@@ -102,10 +110,14 @@ type CategoryResolver interface {
 	Products(ctx context.Context, obj *models.Category) ([]*models.Product, error)
 }
 type MutationResolver interface {
-	CreateProduct(ctx context.Context, name string, description string, price float64, quantity int, category string) (*models.Product, error)
-	CreateCategory(ctx context.Context, name string) (*models.Category, error)
-	RegisterUser(ctx context.Context, name string, emailID string, phoneNumber string, address models.AddressInput) (*models.User, error)
-	SignInUser(ctx context.Context, id string) (*models.User, error)
+	CreateProduct(ctx context.Context, name string, description string, price float64, quantity int, category string, authToken string) (*models.Product, error)
+	CreateCategory(ctx context.Context, name string, authToken string) (*models.Category, error)
+	UpdateProduct(ctx context.Context, id string, product model.UpdateProduct, authToken string) (*models.Product, error)
+	UpdateCategory(ctx context.Context, id string, category model.UpdateCategory, authToken string) (*models.Category, error)
+	RegisterUser(ctx context.Context, user model.RegisterUser) (*models.User, error)
+	SignInUserByEmail(ctx context.Context, user model.SignInUserByEmail) (*models.User, error)
+	SignInUserByOtp(ctx context.Context, user model.SignInUserByOtp) (*models.User, error)
+	VerifyUserEmail(ctx context.Context, authToken string) (*models.User, error)
 }
 type ProductResolver interface {
 	Category(ctx context.Context, obj *models.Product) (*models.Category, error)
@@ -116,6 +128,7 @@ type QueryResolver interface {
 	GetCategories(ctx context.Context, pagination *models.Pagination) ([]*models.Category, error)
 	GetCategory(ctx context.Context, id string) (*models.Category, error)
 	GetAllUsers(ctx context.Context, authToken string) ([]*models.User, error)
+	GetUser(ctx context.Context, authToken string) (*models.User, error)
 }
 
 type executableSchema struct {
@@ -203,7 +216,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateCategory(childComplexity, args["name"].(string)), true
+		return e.complexity.Mutation.CreateCategory(childComplexity, args["name"].(string), args["authToken"].(string)), true
 
 	case "Mutation.CreateProduct":
 		if e.complexity.Mutation.CreateProduct == nil {
@@ -215,7 +228,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateProduct(childComplexity, args["name"].(string), args["description"].(string), args["price"].(float64), args["quantity"].(int), args["Category"].(string)), true
+		return e.complexity.Mutation.CreateProduct(childComplexity, args["name"].(string), args["description"].(string), args["price"].(float64), args["quantity"].(int), args["Category"].(string), args["authToken"].(string)), true
 
 	case "Mutation.RegisterUser":
 		if e.complexity.Mutation.RegisterUser == nil {
@@ -227,19 +240,67 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.RegisterUser(childComplexity, args["name"].(string), args["emailId"].(string), args["phoneNumber"].(string), args["address"].(models.AddressInput)), true
+		return e.complexity.Mutation.RegisterUser(childComplexity, args["user"].(model.RegisterUser)), true
 
-	case "Mutation.SignInUser":
-		if e.complexity.Mutation.SignInUser == nil {
+	case "Mutation.SignInUserByEmail":
+		if e.complexity.Mutation.SignInUserByEmail == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_SignInUser_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_SignInUserByEmail_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.SignInUser(childComplexity, args["ID"].(string)), true
+		return e.complexity.Mutation.SignInUserByEmail(childComplexity, args["user"].(model.SignInUserByEmail)), true
+
+	case "Mutation.SignInUserByOTP":
+		if e.complexity.Mutation.SignInUserByOtp == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_SignInUserByOTP_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.SignInUserByOtp(childComplexity, args["user"].(model.SignInUserByOtp)), true
+
+	case "Mutation.UpdateCategory":
+		if e.complexity.Mutation.UpdateCategory == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_UpdateCategory_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateCategory(childComplexity, args["id"].(string), args["category"].(model.UpdateCategory), args["authToken"].(string)), true
+
+	case "Mutation.UpdateProduct":
+		if e.complexity.Mutation.UpdateProduct == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_UpdateProduct_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateProduct(childComplexity, args["id"].(string), args["product"].(model.UpdateProduct), args["authToken"].(string)), true
+
+	case "Mutation.VerifyUserEmail":
+		if e.complexity.Mutation.VerifyUserEmail == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_VerifyUserEmail_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.VerifyUserEmail(childComplexity, args["authToken"].(string)), true
 
 	case "Product.Category":
 		if e.complexity.Product.Category == nil {
@@ -343,6 +404,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.GetProducts(childComplexity, args["Pagination"].(*models.Pagination)), true
 
+	case "Query.GetUser":
+		if e.complexity.Query.GetUser == nil {
+			break
+		}
+
+		args, err := ec.field_Query_GetUser_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetUser(childComplexity, args["authToken"].(string)), true
+
 	case "User.address":
 		if e.complexity.User.Address == nil {
 			break
@@ -370,6 +443,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.User.ID(childComplexity), true
+
+	case "User.isEmailVerified":
+		if e.complexity.User.IsEmailVerified == nil {
+			break
+		}
+
+		return e.complexity.User.IsEmailVerified(childComplexity), true
+
+	case "User.isPhoneVerified":
+		if e.complexity.User.IsPhoneVerified == nil {
+			break
+		}
+
+		return e.complexity.User.IsPhoneVerified(childComplexity), true
 
 	case "User.name":
 		if e.complexity.User.Name == nil {
@@ -402,6 +489,11 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputAddressInput,
 		ec.unmarshalInputPagination,
+		ec.unmarshalInputRegisterUser,
+		ec.unmarshalInputSignInUserByEmail,
+		ec.unmarshalInputSignInUserByOTP,
+		ec.unmarshalInputUpdateCategory,
+		ec.unmarshalInputUpdateProduct,
 	)
 	first := true
 
@@ -531,6 +623,15 @@ func (ec *executionContext) field_Mutation_CreateCategory_args(ctx context.Conte
 		}
 	}
 	args["name"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["authToken"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authToken"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["authToken"] = arg1
 	return args, nil
 }
 
@@ -582,63 +683,141 @@ func (ec *executionContext) field_Mutation_CreateProduct_args(ctx context.Contex
 		}
 	}
 	args["Category"] = arg4
+	var arg5 string
+	if tmp, ok := rawArgs["authToken"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authToken"))
+		arg5, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["authToken"] = arg5
 	return args, nil
 }
 
 func (ec *executionContext) field_Mutation_RegisterUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["name"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+	var arg0 model.RegisterUser
+	if tmp, ok := rawArgs["user"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
+		arg0, err = ec.unmarshalNRegisterUser2graphql_searchᚋgraphᚋmodelᚐRegisterUser(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["name"] = arg0
-	var arg1 string
-	if tmp, ok := rawArgs["emailId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emailId"))
-		arg1, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["emailId"] = arg1
-	var arg2 string
-	if tmp, ok := rawArgs["phoneNumber"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("phoneNumber"))
-		arg2, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["phoneNumber"] = arg2
-	var arg3 models.AddressInput
-	if tmp, ok := rawArgs["address"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("address"))
-		arg3, err = ec.unmarshalNAddressInput2graphql_searchᚋmodelsᚐAddressInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["address"] = arg3
+	args["user"] = arg0
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_SignInUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_SignInUserByEmail_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.SignInUserByEmail
+	if tmp, ok := rawArgs["user"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
+		arg0, err = ec.unmarshalNSignInUserByEmail2graphql_searchᚋgraphᚋmodelᚐSignInUserByEmail(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["user"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_SignInUserByOTP_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.SignInUserByOtp
+	if tmp, ok := rawArgs["user"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user"))
+		arg0, err = ec.unmarshalNSignInUserByOTP2graphql_searchᚋgraphᚋmodelᚐSignInUserByOtp(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["user"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_UpdateCategory_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
-	if tmp, ok := rawArgs["ID"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ID"))
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
 		arg0, err = ec.unmarshalNID2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["ID"] = arg0
+	args["id"] = arg0
+	var arg1 model.UpdateCategory
+	if tmp, ok := rawArgs["category"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("category"))
+		arg1, err = ec.unmarshalNUpdateCategory2graphql_searchᚋgraphᚋmodelᚐUpdateCategory(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["category"] = arg1
+	var arg2 string
+	if tmp, ok := rawArgs["authToken"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authToken"))
+		arg2, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["authToken"] = arg2
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_UpdateProduct_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 model.UpdateProduct
+	if tmp, ok := rawArgs["product"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("product"))
+		arg1, err = ec.unmarshalNUpdateProduct2graphql_searchᚋgraphᚋmodelᚐUpdateProduct(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["product"] = arg1
+	var arg2 string
+	if tmp, ok := rawArgs["authToken"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authToken"))
+		arg2, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["authToken"] = arg2
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_VerifyUserEmail_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["authToken"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authToken"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["authToken"] = arg0
 	return args, nil
 }
 
@@ -684,6 +863,21 @@ func (ec *executionContext) field_Query_GetProducts_args(ctx context.Context, ra
 		}
 	}
 	args["Pagination"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_GetUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["authToken"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authToken"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["authToken"] = arg0
 	return args, nil
 }
 
@@ -1150,7 +1344,7 @@ func (ec *executionContext) _Mutation_CreateProduct(ctx context.Context, field g
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateProduct(rctx, fc.Args["name"].(string), fc.Args["description"].(string), fc.Args["price"].(float64), fc.Args["quantity"].(int), fc.Args["Category"].(string))
+		return ec.resolvers.Mutation().CreateProduct(rctx, fc.Args["name"].(string), fc.Args["description"].(string), fc.Args["price"].(float64), fc.Args["quantity"].(int), fc.Args["Category"].(string), fc.Args["authToken"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1219,7 +1413,7 @@ func (ec *executionContext) _Mutation_CreateCategory(ctx context.Context, field 
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateCategory(rctx, fc.Args["name"].(string))
+		return ec.resolvers.Mutation().CreateCategory(rctx, fc.Args["name"].(string), fc.Args["authToken"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1268,6 +1462,138 @@ func (ec *executionContext) fieldContext_Mutation_CreateCategory(ctx context.Con
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_UpdateProduct(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_UpdateProduct(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateProduct(rctx, fc.Args["id"].(string), fc.Args["product"].(model.UpdateProduct), fc.Args["authToken"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models.Product)
+	fc.Result = res
+	return ec.marshalNProduct2ᚖgraphql_searchᚋmodelsᚐProduct(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_UpdateProduct(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "Id":
+				return ec.fieldContext_Product_Id(ctx, field)
+			case "Name":
+				return ec.fieldContext_Product_Name(ctx, field)
+			case "Description":
+				return ec.fieldContext_Product_Description(ctx, field)
+			case "Quantity":
+				return ec.fieldContext_Product_Quantity(ctx, field)
+			case "Price":
+				return ec.fieldContext_Product_Price(ctx, field)
+			case "Category":
+				return ec.fieldContext_Product_Category(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Product", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_UpdateProduct_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_UpdateCategory(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_UpdateCategory(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateCategory(rctx, fc.Args["id"].(string), fc.Args["category"].(model.UpdateCategory), fc.Args["authToken"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models.Category)
+	fc.Result = res
+	return ec.marshalNCategory2ᚖgraphql_searchᚋmodelsᚐCategory(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_UpdateCategory(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "Id":
+				return ec.fieldContext_Category_Id(ctx, field)
+			case "Name":
+				return ec.fieldContext_Category_Name(ctx, field)
+			case "Products":
+				return ec.fieldContext_Category_Products(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Category", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_UpdateCategory_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_RegisterUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_RegisterUser(ctx, field)
 	if err != nil {
@@ -1282,7 +1608,7 @@ func (ec *executionContext) _Mutation_RegisterUser(ctx context.Context, field gr
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().RegisterUser(rctx, fc.Args["name"].(string), fc.Args["emailId"].(string), fc.Args["phoneNumber"].(string), fc.Args["address"].(models.AddressInput))
+		return ec.resolvers.Mutation().RegisterUser(rctx, fc.Args["user"].(model.RegisterUser))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1317,10 +1643,14 @@ func (ec *executionContext) fieldContext_Mutation_RegisterUser(ctx context.Conte
 				return ec.fieldContext_User_phoneNumber(ctx, field)
 			case "address":
 				return ec.fieldContext_User_address(ctx, field)
-			case "authToken":
-				return ec.fieldContext_User_authToken(ctx, field)
 			case "role":
 				return ec.fieldContext_User_role(ctx, field)
+			case "authToken":
+				return ec.fieldContext_User_authToken(ctx, field)
+			case "isEmailVerified":
+				return ec.fieldContext_User_isEmailVerified(ctx, field)
+			case "isPhoneVerified":
+				return ec.fieldContext_User_isPhoneVerified(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -1339,8 +1669,8 @@ func (ec *executionContext) fieldContext_Mutation_RegisterUser(ctx context.Conte
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_SignInUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_SignInUser(ctx, field)
+func (ec *executionContext) _Mutation_SignInUserByEmail(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_SignInUserByEmail(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1353,7 +1683,7 @@ func (ec *executionContext) _Mutation_SignInUser(ctx context.Context, field grap
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().SignInUser(rctx, fc.Args["ID"].(string))
+		return ec.resolvers.Mutation().SignInUserByEmail(rctx, fc.Args["user"].(model.SignInUserByEmail))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1370,7 +1700,7 @@ func (ec *executionContext) _Mutation_SignInUser(ctx context.Context, field grap
 	return ec.marshalNUser2ᚖgraphql_searchᚋmodelsᚐUser(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_SignInUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_SignInUserByEmail(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -1388,10 +1718,14 @@ func (ec *executionContext) fieldContext_Mutation_SignInUser(ctx context.Context
 				return ec.fieldContext_User_phoneNumber(ctx, field)
 			case "address":
 				return ec.fieldContext_User_address(ctx, field)
-			case "authToken":
-				return ec.fieldContext_User_authToken(ctx, field)
 			case "role":
 				return ec.fieldContext_User_role(ctx, field)
+			case "authToken":
+				return ec.fieldContext_User_authToken(ctx, field)
+			case "isEmailVerified":
+				return ec.fieldContext_User_isEmailVerified(ctx, field)
+			case "isPhoneVerified":
+				return ec.fieldContext_User_isPhoneVerified(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -1403,7 +1737,157 @@ func (ec *executionContext) fieldContext_Mutation_SignInUser(ctx context.Context
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_SignInUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_SignInUserByEmail_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_SignInUserByOTP(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_SignInUserByOTP(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().SignInUserByOtp(rctx, fc.Args["user"].(model.SignInUserByOtp))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖgraphql_searchᚋmodelsᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_SignInUserByOTP(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "ID":
+				return ec.fieldContext_User_ID(ctx, field)
+			case "name":
+				return ec.fieldContext_User_name(ctx, field)
+			case "emailId":
+				return ec.fieldContext_User_emailId(ctx, field)
+			case "phoneNumber":
+				return ec.fieldContext_User_phoneNumber(ctx, field)
+			case "address":
+				return ec.fieldContext_User_address(ctx, field)
+			case "role":
+				return ec.fieldContext_User_role(ctx, field)
+			case "authToken":
+				return ec.fieldContext_User_authToken(ctx, field)
+			case "isEmailVerified":
+				return ec.fieldContext_User_isEmailVerified(ctx, field)
+			case "isPhoneVerified":
+				return ec.fieldContext_User_isPhoneVerified(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_SignInUserByOTP_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_VerifyUserEmail(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_VerifyUserEmail(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().VerifyUserEmail(rctx, fc.Args["authToken"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖgraphql_searchᚋmodelsᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_VerifyUserEmail(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "ID":
+				return ec.fieldContext_User_ID(ctx, field)
+			case "name":
+				return ec.fieldContext_User_name(ctx, field)
+			case "emailId":
+				return ec.fieldContext_User_emailId(ctx, field)
+			case "phoneNumber":
+				return ec.fieldContext_User_phoneNumber(ctx, field)
+			case "address":
+				return ec.fieldContext_User_address(ctx, field)
+			case "role":
+				return ec.fieldContext_User_role(ctx, field)
+			case "authToken":
+				return ec.fieldContext_User_authToken(ctx, field)
+			case "isEmailVerified":
+				return ec.fieldContext_User_isEmailVerified(ctx, field)
+			case "isPhoneVerified":
+				return ec.fieldContext_User_isPhoneVerified(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_VerifyUserEmail_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -1848,7 +2332,7 @@ func (ec *executionContext) _Query_getCategories(ctx context.Context, field grap
 	}
 	res := resTmp.([]*models.Category)
 	fc.Result = res
-	return ec.marshalNCategory2ᚕᚖgraphql_searchᚋmodelsᚐCategoryᚄ(ctx, field.Selections, res)
+	return ec.marshalNCategory2ᚕᚖgraphql_searchᚋmodelsᚐCategory(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_getCategories(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1995,10 +2479,14 @@ func (ec *executionContext) fieldContext_Query_GetAllUsers(ctx context.Context, 
 				return ec.fieldContext_User_phoneNumber(ctx, field)
 			case "address":
 				return ec.fieldContext_User_address(ctx, field)
-			case "authToken":
-				return ec.fieldContext_User_authToken(ctx, field)
 			case "role":
 				return ec.fieldContext_User_role(ctx, field)
+			case "authToken":
+				return ec.fieldContext_User_authToken(ctx, field)
+			case "isEmailVerified":
+				return ec.fieldContext_User_isEmailVerified(ctx, field)
+			case "isPhoneVerified":
+				return ec.fieldContext_User_isPhoneVerified(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -2011,6 +2499,81 @@ func (ec *executionContext) fieldContext_Query_GetAllUsers(ctx context.Context, 
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_GetAllUsers_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_GetUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_GetUser(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetUser(rctx, fc.Args["authToken"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖgraphql_searchᚋmodelsᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_GetUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "ID":
+				return ec.fieldContext_User_ID(ctx, field)
+			case "name":
+				return ec.fieldContext_User_name(ctx, field)
+			case "emailId":
+				return ec.fieldContext_User_emailId(ctx, field)
+			case "phoneNumber":
+				return ec.fieldContext_User_phoneNumber(ctx, field)
+			case "address":
+				return ec.fieldContext_User_address(ctx, field)
+			case "role":
+				return ec.fieldContext_User_role(ctx, field)
+			case "authToken":
+				return ec.fieldContext_User_authToken(ctx, field)
+			case "isEmailVerified":
+				return ec.fieldContext_User_isEmailVerified(ctx, field)
+			case "isPhoneVerified":
+				return ec.fieldContext_User_isPhoneVerified(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_GetUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -2378,6 +2941,50 @@ func (ec *executionContext) fieldContext_User_address(_ context.Context, field g
 	return fc, nil
 }
 
+func (ec *executionContext) _User_role(ctx context.Context, field graphql.CollectedField, obj *models.User) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_User_role(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Role, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_User_role(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _User_authToken(ctx context.Context, field graphql.CollectedField, obj *models.User) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_User_authToken(ctx, field)
 	if err != nil {
@@ -2419,8 +3026,8 @@ func (ec *executionContext) fieldContext_User_authToken(_ context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _User_role(ctx context.Context, field graphql.CollectedField, obj *models.User) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_User_role(ctx, field)
+func (ec *executionContext) _User_isEmailVerified(ctx context.Context, field graphql.CollectedField, obj *models.User) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_User_isEmailVerified(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2433,31 +3040,69 @@ func (ec *executionContext) _User_role(ctx context.Context, field graphql.Collec
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Role, nil
+		return obj.IsEmailVerified, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(bool)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_User_role(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_User_isEmailVerified(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "User",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _User_isPhoneVerified(ctx context.Context, field graphql.CollectedField, obj *models.User) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_User_isPhoneVerified(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsPhoneVerified, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalOBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_User_isPhoneVerified(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
 		},
 	}
 	return fc, nil
@@ -4325,6 +4970,211 @@ func (ec *executionContext) unmarshalInputPagination(ctx context.Context, obj in
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputRegisterUser(ctx context.Context, obj interface{}) (model.RegisterUser, error) {
+	var it model.RegisterUser
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"name", "emailId", "phoneNumber", "address", "password"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "emailId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emailId"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.EmailID = data
+		case "phoneNumber":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("phoneNumber"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PhoneNumber = data
+		case "address":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("address"))
+			data, err := ec.unmarshalNAddressInput2ᚖgraphql_searchᚋmodelsᚐAddressInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Address = data
+		case "password":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Password = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputSignInUserByEmail(ctx context.Context, obj interface{}) (model.SignInUserByEmail, error) {
+	var it model.SignInUserByEmail
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"emailId", "password"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "emailId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emailId"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.EmailID = data
+		case "password":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Password = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputSignInUserByOTP(ctx context.Context, obj interface{}) (model.SignInUserByOtp, error) {
+	var it model.SignInUserByOtp
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"phoneNumber", "oneTimePassword"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "phoneNumber":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("phoneNumber"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PhoneNumber = data
+		case "oneTimePassword":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("oneTimePassword"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OneTimePassword = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateCategory(ctx context.Context, obj interface{}) (model.UpdateCategory, error) {
+	var it model.UpdateCategory
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"name"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateProduct(ctx context.Context, obj interface{}) (model.UpdateProduct, error) {
+	var it model.UpdateProduct
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"name", "description", "quantity", "price", "categoryId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "description":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Description = data
+		case "quantity":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("quantity"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Quantity = data
+		case "price":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("price"))
+			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Price = data
+		case "categoryId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("categoryId"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CategoryID = data
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -4505,6 +5355,20 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "UpdateProduct":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_UpdateProduct(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "UpdateCategory":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_UpdateCategory(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "RegisterUser":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_RegisterUser(ctx, field)
@@ -4512,9 +5376,23 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "SignInUser":
+		case "SignInUserByEmail":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_SignInUser(ctx, field)
+				return ec._Mutation_SignInUserByEmail(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "SignInUserByOTP":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_SignInUserByOTP(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "VerifyUserEmail":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_VerifyUserEmail(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -4766,6 +5644,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "GetUser":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_GetUser(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "__type":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___type(ctx, field)
@@ -4833,13 +5733,17 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "authToken":
-			out.Values[i] = ec._User_authToken(ctx, field, obj)
 		case "role":
 			out.Values[i] = ec._User_role(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "authToken":
+			out.Values[i] = ec._User_authToken(ctx, field, obj)
+		case "isEmailVerified":
+			out.Values[i] = ec._User_isEmailVerified(ctx, field, obj)
+		case "isPhoneVerified":
+			out.Values[i] = ec._User_isPhoneVerified(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5199,9 +6103,9 @@ func (ec *executionContext) marshalNAddress2ᚖgraphql_searchᚋmodelsᚐAddress
 	return ec._Address(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNAddressInput2graphql_searchᚋmodelsᚐAddressInput(ctx context.Context, v interface{}) (models.AddressInput, error) {
+func (ec *executionContext) unmarshalNAddressInput2ᚖgraphql_searchᚋmodelsᚐAddressInput(ctx context.Context, v interface{}) (*models.AddressInput, error) {
 	res, err := ec.unmarshalInputAddressInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
@@ -5223,7 +6127,7 @@ func (ec *executionContext) marshalNCategory2graphql_searchᚋmodelsᚐCategory(
 	return ec._Category(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCategory2ᚕᚖgraphql_searchᚋmodelsᚐCategoryᚄ(ctx context.Context, sel ast.SelectionSet, v []*models.Category) graphql.Marshaler {
+func (ec *executionContext) marshalNCategory2ᚕᚖgraphql_searchᚋmodelsᚐCategory(ctx context.Context, sel ast.SelectionSet, v []*models.Category) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -5247,7 +6151,7 @@ func (ec *executionContext) marshalNCategory2ᚕᚖgraphql_searchᚋmodelsᚐCat
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNCategory2ᚖgraphql_searchᚋmodelsᚐCategory(ctx, sel, v[i])
+			ret[i] = ec.marshalOCategory2ᚖgraphql_searchᚋmodelsᚐCategory(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -5257,12 +6161,6 @@ func (ec *executionContext) marshalNCategory2ᚕᚖgraphql_searchᚋmodelsᚐCat
 
 	}
 	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
 
 	return ret
 }
@@ -5380,6 +6278,21 @@ func (ec *executionContext) marshalNProduct2ᚖgraphql_searchᚋmodelsᚐProduct
 	return ec._Product(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNRegisterUser2graphql_searchᚋgraphᚋmodelᚐRegisterUser(ctx context.Context, v interface{}) (model.RegisterUser, error) {
+	res, err := ec.unmarshalInputRegisterUser(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNSignInUserByEmail2graphql_searchᚋgraphᚋmodelᚐSignInUserByEmail(ctx context.Context, v interface{}) (model.SignInUserByEmail, error) {
+	res, err := ec.unmarshalInputSignInUserByEmail(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNSignInUserByOTP2graphql_searchᚋgraphᚋmodelᚐSignInUserByOtp(ctx context.Context, v interface{}) (model.SignInUserByOtp, error) {
+	res, err := ec.unmarshalInputSignInUserByOTP(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -5393,6 +6306,16 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNUpdateCategory2graphql_searchᚋgraphᚋmodelᚐUpdateCategory(ctx context.Context, v interface{}) (model.UpdateCategory, error) {
+	res, err := ec.unmarshalInputUpdateCategory(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUpdateProduct2graphql_searchᚋgraphᚋmodelᚐUpdateProduct(ctx context.Context, v interface{}) (model.UpdateProduct, error) {
+	res, err := ec.unmarshalInputUpdateProduct(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNUser2graphql_searchᚋmodelsᚐUser(ctx context.Context, sel ast.SelectionSet, v models.User) graphql.Marshaler {
@@ -5729,6 +6652,45 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 		return graphql.Null
 	}
 	res := graphql.MarshalBoolean(*v)
+	return res
+}
+
+func (ec *executionContext) marshalOCategory2ᚖgraphql_searchᚋmodelsᚐCategory(ctx context.Context, sel ast.SelectionSet, v *models.Category) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Category(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOFloat2ᚖfloat64(ctx context.Context, v interface{}) (*float64, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalFloatContext(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel ast.SelectionSet, v *float64) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalFloatContext(*v)
+	return graphql.WrapContextMarshaler(ctx, res)
+}
+
+func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalInt(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalInt(*v)
 	return res
 }
 

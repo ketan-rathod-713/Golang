@@ -6,9 +6,10 @@ type User {
     emailId: String!
     phoneNumber: String!
     address: Address!
-    authToken: String
     role: String!
-
+    authToken: String
+    isEmailVerified: Boolean
+    isPhoneVerified: Boolean
     # # resolver
     # Cart: Cart!
 }
