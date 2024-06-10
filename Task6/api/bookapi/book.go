@@ -24,7 +24,15 @@ func JSONError(w http.ResponseWriter, err *models.ApiError) {
 	json.NewEncoder(w).Encode(err)
 }
 
-// POST /books
+// @Summary Creates a book
+// @BasePath /book/
+// @Description To create a book
+// @ID book
+// @Produce json
+// @Success 200 {string} string "ok"
+// @Router /book/ [post]
+// @Tags book
+// @Param data body models.CreateBook true "Book Data"
 func (b *bookApi) CreateBook(w http.ResponseWriter, r *http.Request) {
 	// TODO: Get JSON data and decode it
 	var book models.Book
@@ -49,7 +57,12 @@ func (b *bookApi) CreateBook(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(bk)
 }
 
-// GET /books
+// @Summary Get All Books
+// @Description Get All Books
+// @ID get-all-books
+// @Tags book
+// @Produce json
+// @Router /book/ [get]
 func (b *bookApi) GetBooks(w http.ResponseWriter, r *http.Request) {
 	books, err := b.Service.GetBooks()
 
@@ -62,7 +75,14 @@ func (b *bookApi) GetBooks(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(books)
 }
 
-// GET /books/{id}
+// @Summary Get a book by id
+// @Description Get a book by its id
+// @ID get-book-by-id
+// @Tags book
+// @Produce json
+// @Param id path int true "Book ID"
+// @Success 200 {object} models.Book
+// @Router /book/{id} [get]
 func (b *bookApi) GetOneBookById(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(mux.Vars(r)["id"])
 
@@ -82,7 +102,14 @@ func (b *bookApi) GetOneBookById(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(book)
 }
 
-// PUT /books/{id}
+// @Summary Update Book By Id
+// @Description update a book by id
+// @ID update-book-by-id
+// @Tags book
+// @Produce json
+// @Param id path int true "Book ID"
+// @Success 200 {object} models.Book
+// @Router /book/{id} [get]
 func (b *bookApi) UpdateBook(w http.ResponseWriter, r *http.Request) {
 	var book models.Book
 	err := json.NewDecoder(r.Body).Decode(&book)
@@ -105,7 +132,14 @@ func (b *bookApi) UpdateBook(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(bk)
 }
 
-// DELETE /bools/{id}
+// @Summary Delete a book by id
+// @Description Delete a book by its id
+// @ID delete-book-by-id
+// @Tags book
+// @Produce json
+// @Param id path int true "Book ID"
+// @Success 200 {object} models.Book
+// @Router /book/{id} [delete]
 func (b *bookApi) DeleteBook(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 

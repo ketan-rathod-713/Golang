@@ -29,6 +29,16 @@ type Book struct {
 	Users     []*User `json:"users" gorm:"many2many:task6muxgorm.usersbooks;"`
 }
 
+type CreateBook struct {
+	Title     string  `json:"title"`
+	Author    string  `json:"author"`
+	ISBN      string  `json:"isbn" gorm:"unique"`
+	Publisher string  `json:"publisher"`
+	Year      int     `json:"year"`
+	Genre     string  `json:"genre"`
+	Quantity  int     `json:"quantity" gorm:"default:0` // defaults to 0 when created
+}
+
 // Define Book Table Inside books Schema // TODO: How to get schema directly here from any utils package or like that.
 func (b *Book) TableName() string {
 	return fmt.Sprintf("%v.books", SCHEMA)

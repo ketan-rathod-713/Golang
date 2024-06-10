@@ -27,6 +27,10 @@ Routes will expose all book api routes with their respective handlers.
 TODO: No need to expose whole bookapi itself.
 TODO: If any other service required then may be need to expose it too.
 */
+
+// @Tags book
+// @BasePath /book/
+
 func Routes(router *mux.Router, app *app.App) {
 
 	bookApi := newBookApi(app)

@@ -6,9 +6,24 @@ import (
 	"net/http"
 	"task6MuxGorm/api"
 	"task6MuxGorm/app"
+	_ "task6MuxGorm/docs"
 
 	"github.com/gorilla/mux"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
+
+// @title Swagger Example API
+// @version 1.0
+// @description This is a sample server.
+// @host localhost:8080
+// @BasePath /
+
+// @summary Show a hello message
+// @description get hello message
+// @id hello
+// @produce json
+// @success 200 {string} string "ok"
+// @router /hello [get]
 
 func main() {
 	// TODO:Initialise App with DB, initialise environement variables
@@ -27,6 +42,9 @@ func main() {
 	log.Println("API Initialised")
 
 	var router *mux.Router = mux.NewRouter()
+
+	router.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
+
 	mainApi.InitialiseRoutes(router)
 
 	log.Println("Router Initialised", mainApp.Config.PORT)
