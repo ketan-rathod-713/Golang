@@ -1,0 +1,134 @@
+basePath: /
+definitions:
+  models.Book:
+    properties:
+      author:
+        type: string
+      genre:
+        type: string
+      id:
+        type: integer
+      isbn:
+        type: string
+      publisher:
+        type: string
+      quantity:
+        description: defaults to 0 when created
+        type: integer
+      title:
+        type: string
+      users:
+        items:
+          $ref: '#/definitions/models.User'
+        type: array
+      year:
+        type: integer
+    type: object
+  models.CreateBook:
+    properties:
+      author:
+        type: string
+      genre:
+        type: string
+      isbn:
+        type: string
+      publisher:
+        type: string
+      quantity:
+        description: defaults to 0 when created
+        type: integer
+      title:
+        type: string
+      year:
+        type: integer
+    type: object
+  models.User:
+    properties:
+      books:
+        description: referencing to book issued // lets say one user can only issue
+          one book
+        items:
+          $ref: '#/definitions/models.Book'
+        type: array
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: This is a sample server.
+  title: Swagger Example API
+  version: "1.0"
+paths:
+  /book/:
+    get:
+      description: Get All Books
+      operationId: get-all-books
+      produces:
+      - application/json
+      responses: {}
+      summary: Get All Books
+      tags:
+      - book
+    post:
+      description: To create a book
+      operationId: book
+      parameters:
+      - description: Book Data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateBook'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+      summary: Creates a book
+      tags:
+      - book
+  /book/{id}:
+    delete:
+      description: Delete a book by its id
+      operationId: delete-book-by-id
+      parameters:
+      - description: Book ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Book'
+      summary: Delete a book by id
+      tags:
+      - book
+    get:
+      description: update a book by id
+      operationId: update-book-by-id
+      parameters:
+      - description: Book ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Book'
+      summary: Update Book By Id
+      tags:
+      - book
+swagger: "2.0"
