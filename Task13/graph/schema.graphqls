@@ -1,0 +1,46 @@
+type User {
+    id: ID!
+    username: String!
+    email: String!
+
+    # resolver
+    meetups: [Meetup!]!
+}
+
+input NewUser {
+    username: String!
+    email: String!
+}
+
+type Meetup {
+    id: ID!
+    name: String!
+    description: String!
+    user: User!
+}
+
+input NewMeetup {
+  name: String!
+  description: String!
+  user_id: ID!
+}
+
+input UpdateMeetup {
+  name: String 
+  description: String
+}
+
+type Mutation {
+  createMeetup(input: NewMeetup!): Meetup 
+  updateMeetup(id: ID!, input: UpdateMeetup!): Meetup!
+  createUser(input: NewUser!): User
+}
+
+input Search {
+  searchText: String
+}
+
+type Query {
+    meetups(input:Search): [Meetup!]!
+    users: [User!]!
+}
