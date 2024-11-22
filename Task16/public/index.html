@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+
+        .heading {
+            display: flex;
+            justify-content: center;
+            padding: 10px;
+            background-color: white;
+        }
+
+        .heading h1 {
+            text-align: center;
+        }
+
+        .container {
+            margin: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .search-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+
+        #searchInput {
+            width: 100%;
+            font-size: 18px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        #suggestions {
+            max-height: 200px;
+            overflow-x: hidden;
+            overflow-y: auto;
+            width: 100%;
+        }
+
+        .board {
+            cursor: pointer;
+            margin-bottom: 5px;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            width: 100%;
+        }
+
+        .board:hover {
+            background-color: #e0e0e0;
+        }
+
+        .center {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="heading">
+    <h1>Graphql Search</h1>
+</div>
+<div class="container">
+    <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Search Boards By Title, Description Or Id">
+        <div id="suggestions"></div>
+    </div>
+</div>
+
+<script>
+    const HOST = "localhost";
+    const PORT = "8080";
+
+    function search() {
+        // Get the search query from the input box
+        var query = document.getElementById("searchInput").value;
+
+        // Call the function to fetch results
+        fetchResults(query);
+    }
+
+    function showBoardInfo(boardId){
+        const url = `board.html?boardId=${boardId}`;
+        // Navigate to the URL
+        window.open(url, '_blank');
+    }
+
+    function fetchResults(query) {
+        const GET_ALL_BOARDS_BY_TITLE = `
+            query example {
+                boards: GetAllBoardsByTitle(title:"${query}"){
+                    Id,
+                    title 
+                }
+            }
+            `;
+        console.log(GET_ALL_BOARDS_BY_TITLE)
+
+        try {
+            fetch(`http://${HOST}:${PORT}/query`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({query: GET_ALL_BOARDS_BY_TITLE}),
+            }).then(
+                response => response.json()
+            ).then(data => data.data).then(data => {
+                if (data.errors) {
+                    console.log("error occurred");
+                } else {
+                    const {boards} = data;
+                    console.log(boards);
+
+                    // Display board titles as suggestions below input box
+                    const suggestionsDiv = document.getElementById("suggestions");
+                    suggestionsDiv.innerHTML = ""; // Clear previous suggestions
+
+                    if (boards.length == 0) {
+                        suggestionsDiv.innerHTML = "<h2 class='center'>No Boards Found...</h2>"
+                    }
+
+                    boards.forEach((board) => {
+                        const boardDiv = document.createElement("div");
+                        boardDiv.className = "board";
+                        boardDiv.textContent = board.title;
+                        boardDiv.addEventListener("click", ()=>showBoardInfo(board.Id))
+                        suggestionsDiv.appendChild(boardDiv);
+                    });
+                }
+            })
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    // Add event listener to call search function on each key press
+    document
+        .getElementById("searchInput")
+        .addEventListener("keyup", function (event) {
+            setTimeout(() => {
+                search();
+            }, 1000);
+        });
+</script>
+</body>
+</html>
