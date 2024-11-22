@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+// version 1 proto file
+option go_package = "./v1";
+
+// I want internally all the services use authoriseUser service
+service Auth {
+    rpc AuthoriseUser(AuthoriseRequest) returns (AuthoriseResponse);
+    rpc GetUserDetails(UserDetailsRequest) returns (UserDetailsResponse);
+    rpc BookIssue(BookIssueRequest) returns (BookIssueResponse);
+};
+
+message AuthoriseRequest {
+    string JwtToken = 1;
+    string Email = 2;
+};
+
+// in response what i will send to other servers
+// in authorise request no need to send whole data // hence send only important information only
+
+message AuthoriseResponse {
+    string ObjectId = 1;
+    string Email = 2;
+    string Name = 3;
+    string Role = 4;
+}
+
+// get user details based on email Id or object id
+message UserDetailsRequest {
+    string ObjectId = 1;
+}
+
+// it should be no response or a complete user detail
+message UserDetailsResponse {
+    string Error = 1;
+    User User = 2;
+}
+
+// Todo Declare Enum Type for Error in above case
+
+message User {
+    string ObjectId = 1;
+    string Email = 2;
+    string Phone = 3;
+    string Name = 4;
+    string Role = 5;
+    string Standard = 6;
+    string City = 7;
+    string State = 8;
+    string Country = 9;
+    string Address = 10;
+    string Zip = 11;
+}
+
+// issue book to user
+message BookIssueRequest {
+    string UserJwtToken = 1; // i will get user details from this token only
+    string BookId = 2;
+}
+
+// just response which tells if book is issued or not.
+message BookIssueResponse {
+    bool Issued = 1;
+    string Error = 2; // if not issued then what error occured
+}
