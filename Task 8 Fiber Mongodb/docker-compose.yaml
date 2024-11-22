@@ -1,0 +1,31 @@
+version: '3.8'
+services:
+  server:
+    container_name: golang_container
+    build: ./
+    depends_on:
+      - database
+    env_file:
+      - ./.env
+    ports:
+      - "8080:8080"
+    networks:
+      task8fiberMongoNetwork:
+        ipv4_address: 172.20.0.10  # Custom IP address for the server
+  database:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    networks:
+      task8fiberMongoNetwork:
+        ipv4_address: 172.20.0.11  # Custom IP address for the database
+    command: echo Server is starting...
+
+networks:
+  task8fiberMongoNetwork:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16  # Define a specific subnet for the custom IP addresses
