@@ -57,6 +57,28 @@
     - Learning gqlgen
     - Data loaders
 
+## Task 1 : User Form 
+
+### Problem Statement
+
+Create user form using html and css.
+
+### Running Code
+1. Clone this repo
+3. cd Task1
+4. start live server on index.html
+
+## Task 2 : Table
+
+### Problem Statement
+
+Create Table Using Html and css.
+
+### Running Code
+1. Clone this repo
+3. cd Task2
+4. start live server on index.html
+
 ## Task 3 : Sudoku Solver
 
 ### Problem Statement
@@ -104,3 +126,39 @@ Given 3 files. user.json, contact.json and tech.json . Our task is to merge the 
 3. go run main.go
 
 Final output can be seen in result.json file which will be created after running above steps.
+
+## Task 5 : Working With net/http Package
+
+### Problem Statement
+
+Utilise Previously Made UserForm In Task1 to make a post request on server which is made using net/http package. And Store the data in postgresql database. Also Show All Users Data on separate page.
+
+### Solution
+
+- Create a http server using net/http package.
+- Use FileServer for handling static data.
+- Initialize Table in database.
+- Write CRUD operations using sql package.
+- Define Routes using HandleFunc function and serve html templates using html/template library.
+
+### Running Code
+
+Add .env file to ./Task5 , It should look like
+
+```
+DB_USER="bacancy" 
+DB_USER_PASSWORD="admin"
+DATABASE="bacancy"
+HOST="localhost"
+PORT="8081"
+DB_PORT="5432"
+```
+
+1. Clone this repo
+2. Configure Postgresql And Change URL of type const in main.go ( add your username and password )
+3. Execute initialize.sql once in your database ( it will create table for us)
+4. cd Task5
+5. go run server.go
+
+It would start our http server and now we can go to `localhost:8080` to view our fuctionality being served. 
+
