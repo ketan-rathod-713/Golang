@@ -1,4 +1,61 @@
-# Golang
+## Golang Topics
+
+- Golang Fundamentals 
+    - data types
+    - conditionals
+    - loops
+    - structs
+    - pointers
+    - arrays and slices
+    - funtions and closures
+    - variadic functions
+    - standard packages
+        - time
+        - fmt
+        - log
+        - strings
+        - strconv
+        - encoding/Json
+        - encoding/csv
+        - math
+        
+    - interface
+    - methods
+    
+- Database
+    - Postgresql
+        - transaction management and locking
+        - crud operations
+        - user roles and groups
+        - psql
+        - joins
+
+    - Mongodb
+        - fundamentals
+        - crud operations 
+        - aggregation pipeline
+
+- Api Building
+    - net/http package
+    - Gorrilla Mux router
+    - Fiber
+    - sql package and postgresql connection
+    - GORM
+    - Json web tokens
+
+- DB Migrations
+    - CLI 
+    - Code
+
+- GRPC
+    - Client and server implementation
+
+- Socket.io 
+  - implementation
+
+- Graphql
+    - Learning gqlgen
+    - Data loaders
 
 ## Task 1 : User Form 
 
@@ -51,7 +108,6 @@ This Problem can be solved using recursion and backtracking. Below are the steps
 3. cd Task3
 4. go run main.go
 
-
 ## Task 4 : Merging JSON Data
 
 ### Problem Statement
@@ -89,12 +145,14 @@ Utilise Previously Made UserForm In Task1 to make a post request on server which
 
 Add .env file to ./Task5 , It should look like
 
-```DB_USER="bacancy" 
+```
+DB_USER="bacancy" 
 DB_USER_PASSWORD="admin"
 DATABASE="bacancy"
 HOST="localhost"
 PORT="8081"
-DB_PORT="5432"```
+DB_PORT="5432"
+```
 
 1. Clone this repo
 2. Configure Postgresql And Change URL of type const in main.go ( add your username and password )
@@ -103,5 +161,4 @@ DB_PORT="5432"```
 5. go run server.go
 
 It would start our http server and now we can go to `localhost:8080` to view our fuctionality being served. 
-
 
